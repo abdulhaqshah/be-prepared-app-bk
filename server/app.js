@@ -12,7 +12,7 @@ const {User} = require('./DataBase/models/user');
 const {Course} = require('./DataBase/models/course');
 
 const publicPath = path.join(__dirname , '../public');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 
 const app = express();
