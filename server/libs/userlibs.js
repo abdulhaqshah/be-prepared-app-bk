@@ -55,5 +55,3 @@ exports.login = function(req,res){
         res.status(error.status).send(error.message);
     });
 };
-
-
