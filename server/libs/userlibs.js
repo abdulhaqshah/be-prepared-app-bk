@@ -11,7 +11,7 @@ exports.register = function(req,res) {
     let user = new User(body);
 
     user.save().then(() => {
-        res.status(200).send(user);
+        res.status(201).send({message : "User has been created successfully", data : user});
     }).catch ((error) => {
         res.status(400).send(error);
     }); 
@@ -26,9 +26,12 @@ exports.login = function(req,res){
     const validateUser = function(email,password){
     return User.findOne({email}).then((user) => {
         if(!user){
-            return Promise.reject();
+            data = {
+                message : "No user found with the provided email",
+                status : "404"
+            };
+            return Promise.reject(data);
         }
-
         return new Promise ((resolve, reject) => {
             bcrypt.compare(password, user.password , (err,res) => {                
                 if(res)
@@ -36,15 +39,21 @@ exports.login = function(req,res){
                     resolve(user);
                 }
                 else{
-                    reject();
+                    data = {
+                        message : "Password does not match",
+                        status : "403"
+                    };
+                    reject(data);
                 }
             })
         })
     })
 }
     validateUser(body.email, body.password).then((user) => {
-        res.status(200).send(user);
+        res.status(200).send({message : "User has login", data : user});
     }).catch((error) => {   
-        res.status(400).send(error);
+        res.status(error.status).send(error.message);
     });
 };
+
+
