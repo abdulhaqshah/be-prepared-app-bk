@@ -43,6 +43,8 @@ UserSchema.methods.toJSON = function(){
     return _.pick(userObject, ['name', '_id', 'email', 'image', 'progress']);
 }
 
+
+
 UserSchema.pre('save' , function(next){
     let user = this;
 
