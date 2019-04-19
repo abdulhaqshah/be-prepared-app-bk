@@ -32,5 +32,4 @@ CourseSchema.methods.toJSON = function(){
 };
 
 let Course = mongoose.model('Course', CourseSchema);
-
 module.exports = {Course};

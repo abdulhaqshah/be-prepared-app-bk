@@ -10,11 +10,11 @@ exports.register = function(req,res) {
     let body = _.pick(req.body, ['name', 'email','password']);
     let user = new User(body);
 
-        user.save().then(() => {
-            res.status(200).send(user);
-        }).catch ((e) => {
-            res.status(400).send(e);
-        }); 
+    user.save().then(() => {
+        res.status(200).send(user);
+    }).catch ((error) => {
+        res.status(400).send(error);
+    }); 
 };
 
 //login functionality for the app. Checks whether user exist and if exist the information provided is correct
@@ -23,8 +23,7 @@ exports.login = function(req,res){
     let email = body.email;
     let password = body.password;
 
-    const findByCredentials = function(email,password){
-
+    const validateUser = function(email,password){
     return User.findOne({email}).then((user) => {
         if(!user){
             return Promise.reject();
@@ -43,10 +42,9 @@ exports.login = function(req,res){
         })
     })
 }
-
-    findByCredentials(body.email, body.password).then((user) => {
+    validateUser(body.email, body.password).then((user) => {
         res.status(200).send(user);
-    }).catch((e) => {   
-        res.status(400).send(e);
+    }).catch((error) => {   
+        res.status(400).send(error);
     });
 };
