@@ -1,0 +1,10 @@
+{
+    "test" : {
+        "PORT" : 8080,
+        "MONGODB_URI" : "mongodb://localhost:27017/BePreparedApp"
+    },
+    "development" : {
+        "PORT" : 8080,
+        "MONGODB_URI" : "mongodb://localhost:27017/BePreparedApp"
+    }
+}

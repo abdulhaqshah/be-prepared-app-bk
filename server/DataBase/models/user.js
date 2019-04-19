@@ -43,8 +43,6 @@ UserSchema.methods.toJSON = function(){
     return _.pick(userObject, ['name', '_id', 'email', 'image', 'progress']);
 }
 
-
-
 UserSchema.pre('save' , function(next){
     let user = this;
 
@@ -60,8 +58,5 @@ UserSchema.pre('save' , function(next){
     }
 })
 
-
-
 let User = mongoose.model('User', UserSchema);
-
 module.exports = {User};
