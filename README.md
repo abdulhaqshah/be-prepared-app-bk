@@ -2,7 +2,8 @@
 
 ### `Download MongoDB`
 
-Download MongoDB from their site.
+Download MongoDB from their site. Here's the link for Ubuntu.
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 ### `Install`
 
