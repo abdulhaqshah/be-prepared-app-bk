@@ -1,10 +1,7 @@
 const User = require('../DataBase/models/user');
 const _ = require('lodash');
-const fs = require('fs');
 const bcrypt = require('bcryptjs');
-const validator = require('validator');
-const formidable = require('formidable');
-const {statusCodes, messages} = require('../utilities/status')
+const {statusCodes, messages} = require('../utilities/constants')
 
 //register a new user to the app
 exports.register = function(req,res) {
