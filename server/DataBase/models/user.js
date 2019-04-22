@@ -36,13 +36,6 @@ let UserSchema = new mongoose.Schema({
     image: {type : String, default : "images/container-bg.png"}
 });
 
-UserSchema.methods.toJSON = function(){
-    let user = this;
-    let userObject = user.toObject();
-
-    return _.pick(userObject, ['name', '_id', 'email', 'image', 'progress']);
-}
-
 UserSchema.pre('save' , function(next){
     let user = this;
 
@@ -58,5 +51,4 @@ UserSchema.pre('save' , function(next){
     }
 })
 
-let User = mongoose.model('User', UserSchema);
-module.exports = {User};
+module.exports = mongoose.model('User', UserSchema);
