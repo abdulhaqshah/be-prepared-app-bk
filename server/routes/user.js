@@ -4,5 +4,6 @@ const user_controller = require('../libs/userlibs');
 
 router.post('/user/register', user_controller.register);
 router.post('/user/login', user_controller.login);
+router.patch('/user/userUpdate', user_controller.updateUser);
 
 module.exports = router;
