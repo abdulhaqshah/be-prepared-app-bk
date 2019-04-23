@@ -37,4 +37,4 @@ Then run this command to run the mongodb server ./mongod --dbpath ~/mongo-data
 
 ## How to run the Project
 
-To run the project just run this command in your command line nodemon server/app.js
+To run the project just run this command in your command line 'npm start'

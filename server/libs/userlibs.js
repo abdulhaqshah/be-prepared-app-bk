@@ -18,13 +18,11 @@ exports.register = function(req,res) {
 //login functionality for the app. Checks whether user exist and if exist the information provided is correct
 exports.login = function(req,res){
     let body = _.pick(req.body , ['email','password']);
-    let email = body.email;
-    let password = body.password;
 
     const validateUser = function(email,password){
     return User.findOne({email}).then((user) => {
         if(!user){
-            data = {
+            const data = {
                 message : `User ${messages.not_found}`,
                 status : statusCodes.not_found
             };
@@ -35,7 +33,7 @@ exports.login = function(req,res){
                 if(res){
                     resolve(user);
                 }else{
-                    data = {
+                    const data = {
                         message : `Password ${messages.not_match}`,
                         status : statusCodes.forbidden
                     };
