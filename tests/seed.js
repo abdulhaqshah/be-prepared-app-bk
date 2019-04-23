@@ -16,12 +16,12 @@ const users = [{
     password : 'password345'
 }]
 
-const populateUsers = done => {
+const populateUsers = done => { //eslint-disable-line
     User.remove({}).then(() => {
-        var userOne = new User(users[0]).save();
-        var userTwo = new User(users[1]).save();
+        let userOne = new User(users[0]).save();
+        let userTwo = new User(users[1]).save();
         return Promise.all([userOne, userTwo]);
-    }).then(() => done());
+    }).then(() => done()); //eslint-disable-line
 };
 
 module.exports = {users, populateUsers};
