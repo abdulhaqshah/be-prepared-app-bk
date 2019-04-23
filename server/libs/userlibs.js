@@ -1,4 +1,5 @@
 const User = require('../DataBase/models/user');
+const validator = require('validator');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const {statusCodes, messages} = require('../utilities/constants')
@@ -18,11 +19,12 @@ exports.register = function(req,res) {
 //login functionality for the app. Checks whether user exist and if exist the information provided is correct
 exports.login = function(req,res){
     let body = _.pick(req.body , ['email','password']);
+    let data = {};
 
     const validateUser = function(email,password){
     return User.findOne({email}).then((user) => {
         if(!user){
-            const data = {
+            data = {
                 message : `User ${messages.not_found}`,
                 status : statusCodes.not_found
             };
@@ -33,7 +35,7 @@ exports.login = function(req,res){
                 if(res){
                     resolve(user);
                 }else{
-                    const data = {
+                    data = {
                         message : `Password ${messages.not_match}`,
                         status : statusCodes.forbidden
                     };
@@ -48,4 +50,48 @@ exports.login = function(req,res){
     }).catch((error) => {
         res.status(error.status).send(error.message);
     });
+};
+
+exports.updateUser = function(req,res) {
+    let body = req.body;
+    const validationForExistence = (object) => {
+        if(object){
+            return true;
+        }else{//eslint-disable-line
+            return false;
+        }
+    }
+    const emptyCheck = (object) => {
+        if(object.length === 0){
+            return false;
+        }else{//eslint-disable-line
+            return true;
+        }
+    }
+
+    if(emptyCheck(body.name)){
+        if(validationForExistence(body.email)){
+            if(validator.isEmail(body.email)){
+                User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
+                    if(doc){
+                        res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
+                    }else{
+                        res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
+                    }
+                })
+            }else{
+                res.status(statusCodes.forbidden).send(`Email ${messages.invalid}`);
+            }
+        }else{
+            User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
+                if(doc){
+                    res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
+                }else{
+                    res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
+                }
+            })
+        }
+    }else{
+        res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
+    }
 };

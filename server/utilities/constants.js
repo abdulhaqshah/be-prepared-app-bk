@@ -11,7 +11,10 @@ const messages = {
     created : "has been created successfully",
     bad_request : "This is is a bad request",
     not_match : "does not match",
-    not_found : "has not been found"
+    not_found : "has not been found",
+    updated : "has been updated",
+    invalid : "is invalid",
+    empty : "is empty"
 }
 
 module.exports = {statusCodes, messages}
