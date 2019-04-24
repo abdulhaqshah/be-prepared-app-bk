@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "npm run pretest && nodemon server/app.js",
+    "start": "nodemon server/app.js --exec 'npm run pretest && node'",
     "pretest": "eslint --ignore-path .gitignore .",
     "test": "export NODE_ENV=test && mocha **/*.test.js",
     "test-watch": "nodemon --exec 'npm test'"
