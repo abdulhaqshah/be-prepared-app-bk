@@ -54,7 +54,7 @@ exports.login = function(req,res){
 
 exports.updateUser = function(req,res) {
     let body = req.body;
-    
+
     const validationForNameExistence = (object) => {
         if("name" in object){
             return true;
@@ -79,54 +79,35 @@ exports.updateUser = function(req,res) {
         }
     }
 
-    if(validationForNameExistence(body)){
-        if(emptyCheck(body.name)){
-            if(validationForEmailExistence(body)){
-                if(validator.isEmail(body.email)){
-                    User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
-                        if(doc){
-                            res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
-                        }else{
-                            res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
-                        }
-                    })
-                }else{
-                    res.status(statusCodes.forbidden).send(`Email ${messages.invalid}`);
-                }
+    const update = (object) => {
+        User.findByIdAndUpdate(object.id, object, {new: true}, (err, doc) => {
+            if(doc){
+                res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
             }else{
-                User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
-                    if(doc){
-                        res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
-                    }else{
-                        res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
-                    }
-                })
+                res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
             }
-        }else{
-            res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
-        }
-    }else{
-        if(validationForEmailExistence(body)){
-            if(validator.isEmail(body.email)){
-                User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
-                    if(doc){
-                        res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
-                    }else{
-                        res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
-                    }
-                })
+        })
+    }
+
+    const emailValidation = (object) => {
+        if(validationForEmailExistence(object)){
+            if(validator.isEmail(object.email)){
+                update(object);
             }else{
                 res.status(statusCodes.forbidden).send(`Email ${messages.invalid}`);
             }
         }else{
-            User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
-                if(doc){
-                    res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
-                }else{
-                    res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
-                }
-            })
+            update(object);
         }
     }
-    
+
+    if(validationForNameExistence(body)){
+        if(emptyCheck(body.name)){
+            emailValidation(body);
+        }else{
+            res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
+        }
+    }else{
+        emailValidation(body);
+    }
 };
