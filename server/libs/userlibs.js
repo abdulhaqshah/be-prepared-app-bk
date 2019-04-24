@@ -54,13 +54,23 @@ exports.login = function(req,res){
 
 exports.updateUser = function(req,res) {
     let body = req.body;
-    const validationForExistence = (object) => {
-        if(object){
+    
+    const validationForNameExistence = (object) => {
+        if("name" in object){
             return true;
         }else{//eslint-disable-line
             return false;
         }
     }
+
+    const validationForEmailExistence = (object) => {
+        if("email" in object){
+            return true;
+        }else{//eslint-disable-line
+            return false;
+        }
+    }
+
     const emptyCheck = (object) => {
         if(object.length === 0){
             return false;
@@ -69,8 +79,34 @@ exports.updateUser = function(req,res) {
         }
     }
 
-    if(emptyCheck(body.name)){
-        if(validationForExistence(body.email)){
+    if(validationForNameExistence(body)){
+        if(emptyCheck(body.name)){
+            if(validationForEmailExistence(body)){
+                if(validator.isEmail(body.email)){
+                    User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
+                        if(doc){
+                            res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
+                        }else{
+                            res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
+                        }
+                    })
+                }else{
+                    res.status(statusCodes.forbidden).send(`Email ${messages.invalid}`);
+                }
+            }else{
+                User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
+                    if(doc){
+                        res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
+                    }else{
+                        res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
+                    }
+                })
+            }
+        }else{
+            res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
+        }
+    }else{
+        if(validationForEmailExistence(body)){
             if(validator.isEmail(body.email)){
                 User.findByIdAndUpdate(body.id, body, {new: true}, (err, doc) => {
                     if(doc){
@@ -91,7 +127,6 @@ exports.updateUser = function(req,res) {
                 }
             })
         }
-    }else{
-        res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
     }
+    
 };
