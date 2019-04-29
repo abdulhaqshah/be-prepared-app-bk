@@ -54,7 +54,7 @@ exports.updateUser = function (req,res) {
     let body = req.body;
 
     const validationForExistence = (object) => {
-        if ("name" && "email" in object) {
+        if (('name' in object) && ('email' in object)) {
             return 1;
         } else if (!('name' in object) && "email" in object) {
             return 2;
