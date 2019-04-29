@@ -1,15 +1,13 @@
 const User = require ('../DataBase/models/user');
 const validator = require ('validator');
-const _ = require ('lodash');
 const bcrypt = require ('bcryptjs');
 const {statusCodes, messages} = require ('../utilities/constants');
 
 exports.register = function(req,res) {
-    let body = _.pick(req.body, ['name', 'email','password']);
     User.create({
-        name: body.name,
-        email: body.email,
-        password: body.password
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
     }).then((user) => {
         res.status(statusCodes.created).send({message : `User ${messages.created}`, data : user});
     }).catch((error) => {
@@ -45,24 +43,15 @@ exports.login = function(req,res){
 
 exports.updateUser = function (req,res) {
     let body = req.body;
-
     const validationForExistence = (object) => {
         if (('name' in object) && ('email' in object)) {
-            return 1;
+            return 'nameAndEmailBothExists';
         } else if (!('name' in object) && "email" in object) {
-            return 2;
+            return 'emailExistsButNotName';
         } else if (!('email' in object) && "name" in object) {
-            return 3;
+            return 'nameExistsButNotEmail';
         }
-            return 4;
-    }
-
-    const emptyCheck = (object) => {
-        if (object.length === 0) {
-            return false;
-        }
-            return true;
-        
+            return 'bothNameAndEmailDontExist';
     }
 
     const update = (object) => {
@@ -84,22 +73,24 @@ exports.updateUser = function (req,res) {
     }
 
     switch (validationForExistence(body)) {
-        case 1:
-            if (emptyCheck(body.name)) {
+        case 'nameAndEmailBothExists':
+            if (body.name.length > 0) {
                 emailValidation(body);
             } else {
                 res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
             }
             break;
-        case 2:
+        case 'emailExistsButNotName':
             emailValidation(body);
             break;
-        case 3:
-            if (emptyCheck(body.name)) {
+        case 'nameExistsButNotEmail':
+            if (body.name.length > 0) {
                 update(body);
+            } else {
+                res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
             }
             break;
-        case 4:
+        case 'bothNameAndEmailDontExist':
             update(body);
             break;
         default:
