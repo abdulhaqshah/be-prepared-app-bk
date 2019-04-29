@@ -4,50 +4,43 @@ const _ = require ('lodash');
 const bcrypt = require ('bcryptjs');
 const {statusCodes, messages} = require ('../utilities/constants');
 
-exports.register = function (req,res) {
-    let body = _.pick ( req.body, ['name', 'email','password']);
-    let user = new User(body);
-
-    user.save().then( () => {
+exports.register = function(req,res) {
+    let body = _.pick(req.body, ['name', 'email','password']);
+    User.create({
+        name: body.name,
+        email: body.email,
+        password: body.password
+    }).then((user) => {
         res.status(statusCodes.created).send({message : `User ${messages.created}`, data : user});
-    }).catch ( (error) => {
+    }).catch((error) => {
         res.status(statusCodes.bad_request).send(error);
     }); 
 };
 
-exports.login = function (req,res) {
+exports.login = function(req,res){
     let body = req.body;
-    let data = {};
-
-    const validateUser = function (email,password) {
-        return User.findOne({email}).then((user) => {
-            if (!user) {
-                data = {
-                    message : `User ${messages.not_found}`,
-                    status : statusCodes.not_found
-                };
-                return Promise.reject(data);
-            }
-            return new Promise ( (resolve, reject) => {
-                bcrypt.compare(password, user.password , (err,res) => {                
-                    if (res) {
-                        resolve(user);
-                    } else {
-                        data = {
-                            message : `Password ${messages.not_match}`,
-                            status : statusCodes.forbidden
-                        };
-                        reject (data);
-                    }
-                })
+    let email = body.email;
+    let password = body.password;
+    User.findOne({email}).then((user) => {
+        if(!user) {
+            const data = {
+                message : `User ${messages.not_found}`,
+                status : statusCodes.not_found
+            };
+            res.status(data.status).send(data.message);
+        }
+            bcrypt.compare(password, user.password , (err,ans) => {                
+                if(ans) {
+                    res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
+                } else {
+                    const data = {
+                        message : `Password ${messages.not_match}`,
+                        status : statusCodes.forbidden
+                    };
+                    res.status(data.status).send(data.message);
+                }
             })
-        })
-}
-    validateUser(body.email, body.password).then( (user) => {
-        res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
-    }).catch((error) => {
-        res.status(error.status).send(error.message);
-    });
+    })
 };
 
 exports.updateUser = function (req,res) {
@@ -62,7 +55,6 @@ exports.updateUser = function (req,res) {
             return 3;
         }
             return 4;
-        
     }
 
     const emptyCheck = (object) => {
