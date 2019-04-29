@@ -1,5 +1,6 @@
 const User = require('../DataBase/models/user');
 const _ = require('lodash');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {statusCodes, messages} = require('../utilities/constants')
 
@@ -32,20 +33,34 @@ exports.login = function(req,res){
             bcrypt.compare(password, user.password , (err,res) => {                
                 if(res){
                     resolve(user);
-                }else{
+                } else {
                     const data = {
                         message : `Password ${messages.not_match}`,
                         status : statusCodes.forbidden
                     };
                     reject(data);
-                }
+                    }
+                })
             })
         })
-    })
-}
+    }
+
+    const generateToken = function (id) {
+         return User.findOne({_id: id}).then((user) => {
+            if (user) {
+                let access = 'authentication';
+                let token = jwt.sign({_id: user._id.toHexString()}, access, process.env.JWT_SECRET).toString();
+                user.tokens = user.tokens.concat([{access,token}]);
+                return user.save().then(() => token);
+            }
+        }).catch((e) => e);
+    }
+
     validateUser(body.email, body.password).then((user) => {
-        res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
-    }).catch((error) => {
+        generateToken(user._id).then((token) => {
+            res.header('x-authentication', token).status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
+        }).catch((error) => {
         res.status(error.status).send(error.message);
-    });
+        });
+    })
 };
