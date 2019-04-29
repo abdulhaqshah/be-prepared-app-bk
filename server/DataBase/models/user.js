@@ -30,7 +30,20 @@ let UserSchema = new mongoose.Schema({
         completedQuestions : {type : Number, default : 0},
         score : {type : Number, default : 0}
     }],
+<<<<<<< HEAD
     deleted : {type : Boolean, default : false},
+=======
+     tokens : [{
+        access : {
+            type : String,
+            required : true
+        },
+        token : {
+            type : String,
+            required : true
+        }
+    }],
+>>>>>>> Authenticate the user using JWT
     image: {type : String, default : "images/container-bg.png"}
 });
 
