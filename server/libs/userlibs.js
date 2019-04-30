@@ -19,9 +19,7 @@ exports.login = function(req,res){
     let email = req.body.email;
     let password = req.body.password;
     let data = {};
-    User.findOne({email}).then((user) => {Now that we have defined our schema and resolver, we will implement the server inside the file index.js. Start by importing Apollo Server from apollo-server-express. We also need to import our schema and resolvers object from the api/ folder. Then, use GraphQL middleware from the Apollo Server Express library to instantiate the GraphQL API.
-
-
+    User.findOne({email}).then((user) => {
         if(!user) {
             data = {
                 message : `User ${messages.not_found}`,
