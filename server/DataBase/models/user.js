@@ -30,6 +30,7 @@ let UserSchema = new mongoose.Schema({
         completedQuestions : {type : Number, default : 0},
         score : {type : Number, default : 0}
     }],
+    deleted : {type : Boolean, default : false},
     image: {type : String, default : "images/container-bg.png"}
 });
 

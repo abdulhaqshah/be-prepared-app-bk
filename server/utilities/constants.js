@@ -14,7 +14,8 @@ const messages = {
     not_found   : "has not been found",
     updated     : "has been updated",
     invalid     : "is invalid",
-    empty       : "is empty"
+    empty       : "is empty",
+    not_exist   : "does not exist"
 }
 
 module.exports = {statusCodes, messages}

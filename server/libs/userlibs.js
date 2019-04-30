@@ -27,17 +27,24 @@ exports.login = function(req,res){
             };
             res.status(data.status).send(data.message);
         }
-            bcrypt.compare(password, user.password , (err,result) => {                
-                if(result) {
-                    res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
-                } else {
-                    data = {
-                        message : `Password ${messages.not_match}`,
-                        status : statusCodes.forbidden
-                    };
-                    res.status(data.status).send(data.message);
-                }
-            })
+        if(user.deleted) {
+            data = {
+                message : `User ${messages.not_exist}`,
+                status : statusCodes.not_found
+            };
+            res.status(data.status).send(data.message);
+        }
+        bcrypt.compare(password, user.password , (err,result) => {                
+            if(result) {
+                res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
+            } else {
+                data = {
+                    message : `Password ${messages.not_match}`,
+                    status : statusCodes.forbidden
+                };
+                res.status(data.status).send(data.message);
+            }
+        })
     })
 };
 
@@ -55,7 +62,7 @@ exports.updateUser = function (req,res) {
     }
 
     const update = (object) => {
-        User.findByIdAndUpdate(object.id, object, {new: true}, (err, doc) => {
+        User.findOneAndUpdate({_id : object.id, deleted : false}, object, {new: true}, (err, doc) => {
             if (doc) {
                 res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
             } else {
@@ -65,9 +72,9 @@ exports.updateUser = function (req,res) {
     }
 
     const validateEmailAndUpdate = (object) => {
-            if(validator.isEmail(object.email)){
+            if(validator.isEmail(object.email)) {
                 update(object);
-            }else{
+            } else {
                 res.status(statusCodes.forbidden).send(`Email ${messages.invalid}`);
             }
     }
