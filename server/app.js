@@ -3,9 +3,11 @@ require('./config/mongoose');
 const express = require('express');
 const routes = require('./routes/index');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const {port, publicPath} = require('./config/port');
 const app = express();
 
+app.use(cors());
 app.use(express.static(publicPath));
 app.use(bodyParser.json());
 
