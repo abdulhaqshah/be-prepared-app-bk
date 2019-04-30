@@ -16,22 +16,24 @@ exports.register = function(req,res) {
 };
 
 exports.login = function(req,res){
-    let body = req.body;
-    let email = body.email;
-    let password = body.password;
-    User.findOne({email}).then((user) => {
+    let email = req.body.email;
+    let password = req.body.password;
+    let data = {};
+    User.findOne({email}).then((user) => {Now that we have defined our schema and resolver, we will implement the server inside the file index.js. Start by importing Apollo Server from apollo-server-express. We also need to import our schema and resolvers object from the api/ folder. Then, use GraphQL middleware from the Apollo Server Express library to instantiate the GraphQL API.
+
+
         if(!user) {
-            const data = {
+            data = {
                 message : `User ${messages.not_found}`,
                 status : statusCodes.not_found
             };
             res.status(data.status).send(data.message);
         }
-            bcrypt.compare(password, user.password , (err,ans) => {                
-                if(ans) {
+            bcrypt.compare(password, user.password , (err,result) => {                
+                if(result) {
                     res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
                 } else {
-                    const data = {
+                    data = {
                         message : `Password ${messages.not_match}`,
                         status : statusCodes.forbidden
                     };
@@ -64,7 +66,7 @@ exports.updateUser = function (req,res) {
         })
     }
 
-    const emailValidation = (object) => {
+    const validateEmailAndUpdate = (object) => {
             if(validator.isEmail(object.email)){
                 update(object);
             }else{
@@ -75,13 +77,13 @@ exports.updateUser = function (req,res) {
     switch (validationForExistence(body)) {
         case 'nameAndEmailBothExists':
             if (body.name.length > 0) {
-                emailValidation(body);
+                validateEmailAndUpdate(body);
             } else {
                 res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
             }
             break;
         case 'emailExistsButNotName':
-            emailValidation(body);
+            validateEmailAndUpdate(body);
             break;
         case 'nameExistsButNotEmail':
             if (body.name.length > 0) {
