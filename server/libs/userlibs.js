@@ -49,3 +49,13 @@ exports.login = function(req,res){
         res.status(error.status).send(error.message);
     });
 };
+
+exports.deleted = function(req,res) {
+
+    User.findByIdAndUpdate(req.params.id, {$set: {deleted : true}}, {new : true} , (err,doc) => {
+        if(err) {
+            res.status(statusCodes.bad_request).send(`User ${messages.not_found}`)
+        }
+        res.status(statusCodes.successful).send({message : `User ${messages.deleted}`, data : doc});
+    })
+}
