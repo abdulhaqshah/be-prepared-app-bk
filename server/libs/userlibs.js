@@ -3,47 +3,43 @@ const validator = require ('validator');
 const bcrypt = require ('bcryptjs');
 const {statusCodes, messages} = require ('../utilities/constants');
 
-exports.register = function(req,res) {
-    User.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-    }).then((user) => {
-        res.status(statusCodes.created).send({message : `User ${messages.created}`, data : user});
-    }).catch((error) => {
-        res.status(statusCodes.bad_request).send(error);
-    });
+const register = function(userData) {
+    return User.create({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password
+    })
 };
 
-exports.login = function(req,res){
-    let email = req.body.email;
-    let password = req.body.password;
+const login = function(email,password){
     let data = {};
-    User.findOne({email}).then((user) => {
-        if(!user) {
-            data = {
-                message : `User ${messages.not_found}`,
-                status : statusCodes.not_found
-            };
-            res.status(data.status).send(data.message);
-        }
-        if(user.deleted) {
-            data = {
-                message : `User ${messages.not_exist}`,
-                status : statusCodes.not_found
-            };
-            res.status(data.status).send(data.message);
-        }
-        bcrypt.compare(password, user.password , (err,result) => {                
-            if(result) {
-                res.status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
-            } else {
+    return new Promise((resolve, reject) => {
+        User.findOne({email}).then((user) => {
+            if(!user) {
                 data = {
-                    message : `Password ${messages.not_match}`,
-                    status : statusCodes.forbidden
+                    message : `User ${messages.notFound}`,
+                    status : statusCodes.notFound
                 };
-                res.status(data.status).send(data.message);
+                reject(data);
             }
+            if(user.deleted) {
+                data = {
+                    message : `User ${messages.notExist}`,
+                    status : statusCodes.notFound
+                };
+                reject(data);
+            }
+            bcrypt.compare(password, user.password , (err,result) => {                
+                if(result) {
+                    resolve(user);
+                    } else {
+                    data = {
+                        message : `Password ${messages.notMatch}`,
+                        status : statusCodes.forbidden
+                    };
+                    reject(data);
+                }
+            })
         })
     })
 };
@@ -58,19 +54,31 @@ const fieldsValidator = (object) => {
     return false;
 }
 
-exports.updateUser = function (req,res) {
-    let body = req.body;
+const updateUser = function (body) {
     let error = fieldsValidator(body);
+    let data = {};
 
-    if(error){
-        res.status(statusCodes.forbidden).send(error);
-    } else {
-        User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
-            if (doc) {
-                res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
-            } else {
-                res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
+    return new Promise((resolve,reject) => {
+        if(error){
+            data = {
+                status : statusCodes.forbidden,
+                message : error
             }
-        })
-    }
+            reject(data);
+        } else {
+            User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
+                if (doc) {
+                    resolve(doc);
+                    } else {
+                    data = {
+                        status : statusCodes.notFound,
+                        message : `User ${messages.notFound}`
+                    }
+                    reject(data);
+                    }
+            })
+        }
+    })
 };
+
+module.exports = {register, login, updateUser}
