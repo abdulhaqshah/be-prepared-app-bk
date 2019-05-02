@@ -12,7 +12,7 @@ exports.register = function(req,res) {
         res.status(statusCodes.created).send({message : `User ${messages.created}`, data : user});
     }).catch((error) => {
         res.status(statusCodes.bad_request).send(error);
-    }); 
+    });
 };
 
 exports.login = function(req,res){
