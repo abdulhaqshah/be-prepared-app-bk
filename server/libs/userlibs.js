@@ -48,59 +48,29 @@ exports.login = function(req,res){
     })
 };
 
+const fieldsValidator = (object) => {
+    if (("name" in object) && !(object.name)) {
+        return (`Name ${messages.empty}`);
+    }
+    if ((object.email) && !validator.isEmail(object.email)) {
+        return (`Email ${messages.invalid}`);
+    }
+    return false;
+}
+
 exports.updateUser = function (req,res) {
     let body = req.body;
-    const validationForExistence = (object) => {
-        if (('name' in object) && ('email' in object)) {
-            return 'nameAndEmailBothExists';
-        } else if (!('name' in object) && "email" in object) {
-            return 'emailExistsButNotName';
-        } else if (!('email' in object) && "name" in object) {
-            return 'nameExistsButNotEmail';
-        }
-            return 'bothNameAndEmailDontExist';
-    }
+    let error = fieldsValidator(body);
 
-    const update = (object) => {
-        User.findOneAndUpdate({_id : object.id, deleted : false}, object, {new: true}, (err, doc) => {
+    if(error){
+        res.status(statusCodes.forbidden).send(error);
+    } else {
+        User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
             if (doc) {
                 res.status(statusCodes.successful).send({message : `User ${messages.updated}`, data : doc})
             } else {
                 res.status(statusCodes.not_found).send(`User ${messages.not_found}`);
             }
         })
-    }
-
-    const validateEmailAndUpdate = (object) => {
-            if(validator.isEmail(object.email)) {
-                update(object);
-            } else {
-                res.status(statusCodes.forbidden).send(`Email ${messages.invalid}`);
-            }
-    }
-
-    switch (validationForExistence(body)) {
-        case 'nameAndEmailBothExists':
-            if (body.name.length > 0) {
-                validateEmailAndUpdate(body);
-            } else {
-                res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
-            }
-            break;
-        case 'emailExistsButNotName':
-            validateEmailAndUpdate(body);
-            break;
-        case 'nameExistsButNotEmail':
-            if (body.name.length > 0) {
-                update(body);
-            } else {
-                res.status(statusCodes.forbidden).send(`Name ${messages.empty}`);
-            }
-            break;
-        case 'bothNameAndEmailDontExist':
-            update(body);
-            break;
-        default:
-            break;
     }
 };
