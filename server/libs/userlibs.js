@@ -104,36 +104,3 @@ const updateUser = function (body) {
 };
 
 module.exports = {register, login, updateUser}
-    const validateUser = function(email,password){
-    return User.findOne({email}).then((user) => {
-        if(!user){
-            const data = {
-                message : `User ${messages.not_found}`,
-                status : statusCodes.not_found
-            };
-            res.status(data.status).send(data.message);
-        }
-        if(user.deleted) {
-            data = {
-                message : `User ${messages.not_exist}`,
-                status : statusCodes.not_found
-            };
-            res.status(data.status).send(data.message);
-        }
-        bcrypt.compare(password, user.password , (err,result) => {                
-            if(result) {
-                generateToken(user._id).then((token) => {
-                    res.header('x-authentication', token).status(statusCodes.successful).send({message : `Login ${messages.successful}`, data : user});
-                }).catch((error) => {
-                res.status(error.status).send(error.message);
-                });
-            } else {
-                data = {
-                    message : `Password ${messages.not_match}`,
-                    status : statusCodes.forbidden
-                };
-                res.status(data.status).send(data.message);
-            }
-        })
-    })
-};
