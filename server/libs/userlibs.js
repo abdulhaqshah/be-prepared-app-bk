@@ -1,80 +1,98 @@
 const User = require ('../DataBase/models/user');
-const validator = require ('validator');
 const bcrypt = require ('bcryptjs');
+const {fieldsValidator} = require('./../utilities/utilityFunctions')
 const {statusCodes, messages} = require ('../utilities/constants');
 
 const register = function(userData) {
-    return User.create({
-        name: userData.name,
-        email: userData.email,
-        password: userData.password
-    })
-};
-
-const login = function(email,password){
-    let data = {};
-    return new Promise((resolve, reject) => {
-        User.findOne({email}).then((user) => {
-            if(!user) {
-                data = {
-                    message : `User ${messages.notFound}`,
-                    status : statusCodes.notFound
-                };
-                reject(data);
+    return new Promise((resolve,reject) => {
+        if(!userData.name) {
+            reject({
+                message: `Name ${messages.empty}`,
+                status : statusCodes.forbidden
+            })
+        }
+        if(!userData.password) {
+            reject({
+                message: `Password ${messages.notProvided}`,
+                status : statusCodes.forbidden
+            })
+        }
+        User.create({
+            name: userData.name,
+            email: userData.email,
+            password: userData.password
+        }).then((user) => {
+            resolve({
+                status : statusCodes.created,
+                message : `User ${messages.created}`, 
+                data : user
+            })
+        }).catch((error) => {
+            if(error.code === 11000){
+                reject({
+                    message: `Email ${messages.duplicate}`,
+                    status : statusCodes.badRequest
+                })
             }
-            if(user.deleted) {
-                data = {
-                    message : `User ${messages.notExist}`,
-                    status : statusCodes.notFound
-                };
-                reject(data);
-            }
-            bcrypt.compare(password, user.password , (err,result) => {                
-                if(result) {
-                    resolve(user);
-                    } else {
-                    data = {
-                        message : `Password ${messages.notMatch}`,
-                        status : statusCodes.forbidden
-                    };
-                    reject(data);
-                }
+            reject({
+                message: `Email ${messages.invalid}`,
+                status : statusCodes.forbidden
             })
         })
     })
 };
 
-const fieldsValidator = (object) => {
-    if (("name" in object) && !(object.name)) {
-        return (`Name ${messages.empty}`);
-    }
-    if ((object.email) && !validator.isEmail(object.email)) {
-        return (`Email ${messages.invalid}`);
-    }
-    return false;
-}
+const login = function(body){
+    return new Promise((resolve, reject) => {
+        User.findOne({email : body.email, deleted : false}).then((user) => {
+            if(!user) {
+                reject({
+                    message : `User ${messages.notFound}`,
+                    status : statusCodes.notFound
+            });
+            }
+            bcrypt.compare(body.password, user.password , (err,result) => {                
+                if(result) {
+                    resolve({status : statusCodes.successful, message : `Login ${messages.successful}`, data : user});
+                    } else {
+                    reject({
+                        message : `Password ${messages.notMatch}`,
+                        status : statusCodes.forbidden
+                    });
+                }
+            })
+        }).catch((error) => {
+            reject({
+                message : messages.notMatch,
+                error,
+                status : statusCodes.badRequest
+            });
+        })
+    })
+};
 
 const updateUser = function (body) {
     let error = fieldsValidator(body);
-    let data = {};
 
     return new Promise((resolve,reject) => {
         if(error){
-            data = {
+            reject({
                 status : statusCodes.forbidden,
                 message : error
-            }
-            reject(data);
+            });
         } else {
             User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
                 if (doc) {
-                    resolve(doc);
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `User ${messages.updated}`, 
+                        data : doc
+                    });
                     } else {
-                    data = {
+                    reject({
                         status : statusCodes.notFound,
                         message : `User ${messages.notFound}`
-                    }
-                    reject(data);
+                    });
                     }
             })
         }

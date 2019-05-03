@@ -1,9 +1,9 @@
 const statusCodes = {
     successful  : "200",
     created     : "201",
-    badRequest : "400",
+    badRequest  : "400",
     forbidden   : "403",
-    notFound   : "404"
+    notFound    : "404"
 }
 
 const messages = {
@@ -17,7 +17,7 @@ const messages = {
     empty       : "is empty",
     notExist    : "does not exist",
     duplicate   : "already exist",
-    notProvided    : "not provided"
+    notProvided : "not provided"
 }
 
 module.exports = {statusCodes, messages}
