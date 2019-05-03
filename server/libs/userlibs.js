@@ -7,14 +7,14 @@ const register = function(userData) {
     return new Promise((resolve,reject) => {
         if(!userData.name) {
             reject({
-                message: `Name ${messages.empty}`,
-                status : statusCodes.forbidden
+                status : statusCodes.forbidden,
+                message: `Name ${messages.empty}`
             })
         }
         if(!userData.password) {
             reject({
-                message: `Password ${messages.notProvided}`,
-                status : statusCodes.forbidden
+                status : statusCodes.forbidden,
+                message: `Password ${messages.notProvided}`
             })
         }
         User.create({
@@ -28,15 +28,15 @@ const register = function(userData) {
                 data : user
             })
         }).catch((error) => {
-            if(error.code === 11000){
+            if(error.code === 11000) {
                 reject({
-                    message: `Email ${messages.duplicate}`,
-                    status : statusCodes.badRequest
+                    status : statusCodes.badRequest,
+                    message: `Email ${messages.duplicate}`   
                 })
             }
             reject({
-                message: `Email ${messages.invalid}`,
-                status : statusCodes.forbidden
+                status : statusCodes.forbidden,
+                message: `Email ${messages.invalid}`
             })
         })
     })
@@ -47,25 +47,29 @@ const login = function(body){
         User.findOne({email : body.email, deleted : false}).then((user) => {
             if(!user) {
                 reject({
-                    message : `User ${messages.notFound}`,
-                    status : statusCodes.notFound
-            });
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
             }
             bcrypt.compare(body.password, user.password , (err,result) => {                
                 if(result) {
-                    resolve({status : statusCodes.successful, message : `Login ${messages.successful}`, data : user});
-                    } else {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Login ${messages.successful}`,
+                        data : user
+                    });
+                } else {
                     reject({
-                        message : `Password ${messages.notMatch}`,
-                        status : statusCodes.forbidden
+                        status : statusCodes.forbidden,
+                        message : `Password ${messages.notMatch}`
                     });
                 }
             })
         }).catch((error) => {
             reject({
+                status : statusCodes.badRequest,
                 message : messages.notMatch,
-                error,
-                status : statusCodes.badRequest
+                error
             });
         })
     })
@@ -88,12 +92,12 @@ const updateUser = function (body) {
                         message : `User ${messages.updated}`, 
                         data : doc
                     });
-                    } else {
+                } else {
                     reject({
                         status : statusCodes.notFound,
                         message : `User ${messages.notFound}`
                     });
-                    }
+                }
             })
         }
     })
