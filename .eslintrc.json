@@ -110,7 +110,7 @@
         "max-params": "error",
         "max-statements": "off",
         "max-statements-per-line": "error",
-        "multiline-comment-style": "error",
+        "multiline-comment-style": "off",
         "multiline-ternary": "error",
         "new-parens": "error",
         "newline-after-var": "off",
@@ -134,6 +134,7 @@
         "no-eval": "error",
         "no-extend-native": "error",
         "no-extra-bind": "error",
+        "no-extra-boolean-cast": "off",
         "no-extra-label": "error",
         "no-extra-parens": "off",
         "no-floating-decimal": "error",
@@ -172,7 +173,7 @@
         "no-process-env": "off",
         "no-process-exit": "error",
         "no-proto": "error",
-        "no-prototype-builtins": "error",
+        "no-prototype-builtins": "off",
         "no-restricted-globals": "error",
         "no-restricted-imports": "error",
         "no-restricted-modules": "error",
@@ -258,10 +259,7 @@
         "space-in-parens": "off",
         "space-infix-ops": "error",
         "space-unary-ops": "error",
-        "spaced-comment": [
-            "error",
-            "never"
-        ],
+        "spaced-comment": "off",
         "strict": [
             "error",
             "never"

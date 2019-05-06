@@ -31,16 +31,6 @@ let UserSchema = new mongoose.Schema({
         score : {type : Number, default : 0}
     }],
     deleted : {type : Boolean, default : false},
-     tokens : [{
-        access : {
-            type : String,
-            required : true
-        },
-        token : {
-            type : String,
-            required : true
-        }
-    }],
     image: {type : String, default : "images/container-bg.png"}
 });
 

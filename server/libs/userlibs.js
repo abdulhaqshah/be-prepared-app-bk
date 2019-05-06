@@ -1,5 +1,6 @@
 const User = require ('../DataBase/models/user');
 const bcrypt = require ('bcryptjs');
+const jwt = require('jsonwebtoken');
 const {fieldsValidator} = require('./../utilities/utilityFunctions')
 const {statusCodes, messages} = require ('../utilities/constants');
 
@@ -51,12 +52,15 @@ const login = function(body){
                     message : `User ${messages.notFound}`
                 });
             }
-            bcrypt.compare(body.password, user.password , (err,result) => {                
+            bcrypt.compare(body.password, user.password , (err,result) => {            
                 if(result) {
+                    let access = 'authentication';
+                    let token = jwt.sign({_id: user._id.toHexString()}, access, process.env.JWT_SECRET).toString();
                     resolve({
                         status : statusCodes.successful,
                         message : `Login ${messages.successful}`,
-                        data : user
+                        data : user,
+                        token
                     });
                 } else {
                     reject({
@@ -68,7 +72,7 @@ const login = function(body){
         }).catch((error) => {
             reject({
                 status : statusCodes.badRequest,
-                message : messages.notMatch,
+                message : `Something ${messages.notMatch}`,
                 error
             });
         })

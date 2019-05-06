@@ -1,5 +1,6 @@
 const validator = require ('validator');
 const {messages} = require ('./constants');
+const User = require ('./../DataBase/models/user')
 
 const fieldsValidator = (object) => {
     if (("name" in object) && !(object.name)) {
@@ -11,4 +12,14 @@ const fieldsValidator = (object) => {
     return false;
 }
 
-module.exports = {fieldsValidator};
+const isEmpty = (obj) => {
+    for(let key in obj) {
+        if(obj.hasOwnProperty(key)) {
+            return false;
+        } 
+    }
+    return true;
+}
+
+
+module.exports = {fieldsValidator, isEmpty};

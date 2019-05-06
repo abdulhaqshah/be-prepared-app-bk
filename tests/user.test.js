@@ -26,7 +26,6 @@ describe('POST /user/register' , () => {
             if(err){
                 return done(err);
             }
-
             User.findOne({email}).then((user) => {
                 expect(user).toBeTruthy();
                 expect(user.password).not.toBe(password);
@@ -44,7 +43,7 @@ describe('POST /user/register' , () => {
             email : 'sadad',
             password : 'asd'
         })
-        .expect(400)
+        .expect(403)
         .end(done);
     });
 
