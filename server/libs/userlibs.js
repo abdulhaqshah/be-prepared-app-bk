@@ -97,6 +97,12 @@ const updateUser = function (body) {
                         data : doc
                     });
                 } else {
+                    if(err.code === 11000) {
+                        reject({
+                            status : statusCodes.forbidden,
+                            message : `Email ${messages.duplicate}`
+                        });
+                    }
                     reject({
                         status : statusCodes.notFound,
                         message : `User ${messages.notFound}`
