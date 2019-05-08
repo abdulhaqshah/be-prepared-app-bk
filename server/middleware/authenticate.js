@@ -21,6 +21,7 @@ const findByToken = function(token,req) {
         return Promise.reject({status : statusCodes.unauthorized, message : messages.unauthorized});
     }
     if(req.body.id === decoded._id) {
+        console.log(decoded);//eslint-disable-line no-console
         return User.findById(req.body.id);
     }
     return Promise.reject({status : statusCodes.unauthorized, message : messages.unauthorized});
@@ -41,7 +42,7 @@ let authenticate = (req, res, next) => {
             });
         }
         return Promise.reject({status : statusCodes.unauthorized, message : messages.unauthorized});
-    }).catch((err) => Promise.reject({status : statusCodes.unauthorized, message : messages.unauthorized}));
+    }).catch((error) => error);
 };
 
 module.exports = {authenticate};

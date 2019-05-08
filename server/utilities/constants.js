@@ -17,7 +17,7 @@ const messages = {
     invalid      : "is invalid",
     empty        : "is empty",
     notExist     : "does not exist",
-    duplicate    : "already exist",
+    duplicate    : "already exists",
     notProvided  : "not provided",
     unauthorized : "Unauthorized"
 }

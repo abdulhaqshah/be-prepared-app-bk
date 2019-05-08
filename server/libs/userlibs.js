@@ -55,7 +55,7 @@ const login = function(body){
             bcrypt.compare(body.password, user.password , (err,result) => {            
                 if(result) {
                     let access = 'authentication';
-                    let token = jwt.sign({_id: user._id.toHexString()}, access, process.env.JWT_SECRET).toString();
+                    let token = jwt.sign({_id: user._id.toHexString()}, access, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
                         status : statusCodes.successful,
                         message : `Login ${messages.successful}`,
