@@ -2,21 +2,16 @@ const User = require ('../DataBase/models/user');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {fieldsValidator} = require('./../utilities/utilityFunctions')
-const {statusCodes, messages} = require ('../utilities/constants');
+const {statusCodes, messages, secretKeys} = require ('../utilities/constants');
 
 const register = function(userData) {
     return new Promise((resolve,reject) => {
-        if(!userData.name) {
+        let result = fieldsValidator(userData);
+        if(result) {
             reject({
-                status : statusCodes.forbidden,
-                message: `Name ${messages.empty}`
-            })
-        }
-        if(!userData.password) {
-            reject({
-                status : statusCodes.forbidden,
-                message: `Password ${messages.notProvided}`
-            })
+                status : statusCodes.forBidden,
+                message : result
+            });
         }
         User.create({
             name: userData.name,
@@ -35,15 +30,12 @@ const register = function(userData) {
                     message: `Email ${messages.duplicate}`   
                 })
             }
-            reject({
-                status : statusCodes.forbidden,
-                message: `Email ${messages.invalid}`
-            })
+            reject({error})
         })
     })
 };
 
-const login = function(body){
+const login = function(body) {
     return new Promise((resolve, reject) => {
         User.findOne({email : body.email, deleted : false}).then((user) => {
             if(!user) {
@@ -54,8 +46,7 @@ const login = function(body){
             }
             bcrypt.compare(body.password, user.password , (err,result) => {            
                 if(result) {
-                    let access = 'authentication';
-                    let token = jwt.sign({_id: user._id.toHexString()}, access, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+                    let token = jwt.sign({_id: user._id.toHexString()}, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
                         status : statusCodes.successful,
                         message : `Login ${messages.successful}`,
@@ -64,7 +55,7 @@ const login = function(body){
                     });
                 } else {
                     reject({
-                        status : statusCodes.forbidden,
+                        status : statusCodes.forBidden,
                         message : `Password ${messages.notMatch}`
                     });
                 }
@@ -80,13 +71,13 @@ const login = function(body){
 };
 
 const updateUser = function (body) {
-    let error = fieldsValidator(body);
+    let result = fieldsValidator(body);
 
     return new Promise((resolve,reject) => {
-        if(error){
+        if(result) {
             reject({
-                status : statusCodes.forbidden,
-                message : error
+                status : statusCodes.forBidden,
+                message : result
             });
         } else {
             User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
@@ -99,7 +90,7 @@ const updateUser = function (body) {
                 } else {
                     if(err.code === 11000) {
                         reject({
-                            status : statusCodes.forbidden,
+                            status : statusCodes.forBidden,
                             message : `Email ${messages.duplicate}`
                         });
                     }

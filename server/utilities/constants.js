@@ -2,7 +2,7 @@ const statusCodes = {
     successful   : "200",
     created      : "201",
     badRequest   : "400",
-    forbidden    : "403",
+    forBidden    : "403",
     notFound     : "404",
     unauthorized : "401"
 }
@@ -22,4 +22,8 @@ const messages = {
     unauthorized : "Unauthorized"
 }
 
-module.exports = {statusCodes, messages}
+const secretKeys = {
+    tokenKey : 'I am a key for authentication token'
+}
+
+module.exports = {statusCodes, messages, secretKeys}

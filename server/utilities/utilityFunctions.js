@@ -9,6 +9,9 @@ const fieldsValidator = (object) => {
     if ((object.email) && !validator.isEmail(object.email)) {
         return `Email ${messages.invalid}`;
     }
+    if(("password" in object) && !(object.password)) {
+        return `Password ${messages.empty}`;
+    }
     return false;
 }
 
