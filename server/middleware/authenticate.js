@@ -20,7 +20,7 @@ const findByToken = function(token,id,req) {
 }
 const authenticate = (req, res, next) => {
     let token = req.header('x-authentication');
-    let id = req.header('id');
+    let id = req.header('uuid');
     Token.findOne({token}).then((result) => {
         if (result) {
             res.status(statusCodes.unauthorized).send({status : statusCodes.unauthorized, message : messages.unauthorized});
