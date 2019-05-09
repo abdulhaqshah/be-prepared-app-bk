@@ -27,4 +27,12 @@ router.patch('/user/userUpdate', authenticate, (req,res) => {
     })
 });
 
+router.post('/user/logout', authenticate, (req,res) => {
+    userLibs.logOut(req).then((success) => {
+        res.status(success.status).send(success);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
 module.exports = router;
