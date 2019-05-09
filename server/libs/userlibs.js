@@ -1,4 +1,5 @@
 const User = require ('../DataBase/models/user');
+const Token = require('../DataBase/models/tokens');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {fieldsValidate} = require('./../utilities/utilityFunctions')
@@ -18,10 +19,16 @@ const register = function(userData) {
             email: userData.email,
             password: userData.password
         }).then((user) => {
-            resolve({
-                status : statusCodes.created,
-                message : `User ${messages.created}`, 
-                data : user
+            if (user) {
+                resolve({
+                    status : statusCodes.created,
+                    message : `User ${messages.created}`, 
+                    data : user
+                })
+            }
+            reject({
+                status : statusCodes.badRequest,
+                message: `${messages.wrong}`   
             })
         }).catch((error) => {
             if(error.code === 11000) {
@@ -47,7 +54,11 @@ const login = function(body) {
             bcrypt.compare(body.password, user.password , (err,result) => {            
                 if (result) {
                     const uuid = user.uuid;
-                    let token = jwt.sign({_id: uuid}, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+                    let payload = {
+                        _id : uuid,
+                        it : Date.now()
+                    }
+                    let token = jwt.sign(payload, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
                         status : statusCodes.successful,
                         message : `Login ${messages.successful}`,
@@ -108,4 +119,33 @@ const updateUser = function (body) {
     })
 };
 
-module.exports = {register, login, updateUser}
+const logOut = function(request) {
+    return new Promise((resolve,reject) => {
+        let token = request.header('x-authentication');
+        let decoded = {};
+        try {
+            decoded = jwt.verify(token, secretKeys.tokenKey, process.env.JWT_SECRET);
+        } catch (error) {
+            reject(error);
+        }
+        Token.create({
+            token,
+            createdAt : decoded.it      
+        }).then((token) => {
+            if (token) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.logOut}`
+                })
+            }
+            reject({
+                status : statusCodes.badRequest,
+                message: `${messages.wrong}`   
+            })
+        }).catch((error) => {
+            reject({error});
+        })
+    })
+}
+
+module.exports = {register, login, updateUser, logOut}

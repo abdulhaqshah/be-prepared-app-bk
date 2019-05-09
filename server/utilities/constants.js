@@ -19,7 +19,9 @@ const messages = {
     notExist     : "does not exist",
     duplicate    : "already exists",
     notProvided  : "not provided",
-    unauthorized : "Unauthorized"
+    unauthorized : "Unauthorized",
+    wrong        : "Something went wrong",
+    logOut       : "has logout"
 }
 
 const secretKeys = {
