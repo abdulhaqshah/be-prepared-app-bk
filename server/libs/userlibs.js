@@ -1,13 +1,13 @@
 const User = require ('../DataBase/models/user');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {fieldsValidator} = require('./../utilities/utilityFunctions')
+const {fieldsValidate} = require('./../utilities/utilityFunctions')
 const {statusCodes, messages, secretKeys} = require ('../utilities/constants');
 
 const register = function(userData) {
     return new Promise((resolve,reject) => {
-        let result = fieldsValidator(userData);
-        if(result) {
+        let result = fieldsValidate(userData);
+        if (result) {
             reject({
                 status : statusCodes.forBidden,
                 message : result
@@ -38,14 +38,14 @@ const register = function(userData) {
 const login = function(body) {
     return new Promise((resolve, reject) => {
         User.findOne({email : body.email, deleted : false}).then((user) => {
-            if(!user) {
+            if (!user) {
                 reject({
                     status : statusCodes.notFound,
                     message : `User ${messages.notFound}`
                 });
             }
             bcrypt.compare(body.password, user.password , (err,result) => {            
-                if(result) {
+                if (result) {
                     let token = jwt.sign({_id: user._id.toHexString()}, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
                         status : statusCodes.successful,
@@ -71,10 +71,10 @@ const login = function(body) {
 };
 
 const updateUser = function (body) {
-    let result = fieldsValidator(body);
+    let result = fieldsValidate(body);
 
     return new Promise((resolve,reject) => {
-        if(result) {
+        if (result) {
             reject({
                 status : statusCodes.forBidden,
                 message : result
