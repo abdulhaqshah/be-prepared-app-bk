@@ -13,11 +13,10 @@ const findByToken = function(token,id,req) {
             reject(error);
         }
         if (id === decoded._id) {
-            resolve(User.findById(req.body.id));
+            resolve(User.findOne({uuid : id}));
         }
         reject({status : statusCodes.unauthorized, message : messages.unauthorized});
     })
-    
 }
 const authenticate = (req, res, next) => {
     let token = req.header('x-authentication');
@@ -37,7 +36,6 @@ const authenticate = (req, res, next) => {
                 res.status(statusCodes.unauthorized).send({status : statusCodes.unauthorized, message : messages.unauthorized});
             });
         }
-
     }).catch((error) => error);
 };
 

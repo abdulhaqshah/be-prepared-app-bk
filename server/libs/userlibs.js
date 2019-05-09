@@ -46,12 +46,12 @@ const login = function(body) {
             }
             bcrypt.compare(body.password, user.password , (err,result) => {            
                 if (result) {
-                    let token = jwt.sign({_id: user._id.toHexString()}, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+                    const uuid = user.uuid;
+                    let token = jwt.sign({_id: uuid}, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
                         status : statusCodes.successful,
                         message : `Login ${messages.successful}`,
-                        data : user,
-                        token
+                        data : {user,token}
                     });
                 } else {
                     reject({
@@ -80,25 +80,29 @@ const updateUser = function (body) {
                 message : result
             });
         } else {
-            User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
-                if (doc) {
+            User.findOneAndUpdate({uuid : body.uuid, deleted : false}, body, {new: true}).then((user) => {
+                if (user) {
                     resolve({
                         status : statusCodes.successful,
                         message : `User ${messages.updated}`, 
-                        data : doc
-                    });
-                } else {
-                    if(err.code === 11000) {
-                        reject({
-                            status : statusCodes.forBidden,
-                            message : `Email ${messages.duplicate}`
-                        });
-                    }
-                    reject({
-                        status : statusCodes.notFound,
-                        message : `User ${messages.notFound}`
+                        data : user
                     });
                 }
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }).catch((error) => {
+                if(error.code === 11000) {
+                    reject({
+                        status : statusCodes.forBidden,
+                        message : `Email ${messages.duplicate}`
+                    });
+                }
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
             })
         }
     })
