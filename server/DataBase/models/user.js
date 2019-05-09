@@ -1,8 +1,14 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const uuidv4 = require('uuid/v4');
 const bcrypt = require('bcryptjs');
 
+
 let UserSchema = new mongoose.Schema({
+    uuid : {
+        type : String,
+        unique : true
+    },
     name : {
         type : String,
         required : true,
@@ -34,17 +40,18 @@ let UserSchema = new mongoose.Schema({
     image: {type : String, default : "images/container-bg.png"}
 });
 
-UserSchema.pre('save' , function(next){
+UserSchema.pre('save' , function(next) {
     let user = this;
 
-    if(user.isModified('password')){
+    if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, (err,hash) => {
                 user.password = hash;
                 next();
             })
         })
-    }else{
+        user.uuid = uuidv4();
+    } else {
         next();
     }
 })

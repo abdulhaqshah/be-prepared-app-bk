@@ -1,21 +1,17 @@
 const User = require ('../DataBase/models/user');
 const bcrypt = require ('bcryptjs');
-const {fieldsValidator} = require('./../utilities/utilityFunctions')
-const {statusCodes, messages} = require ('../utilities/constants');
+const jwt = require('jsonwebtoken');
+const {fieldsValidate} = require('./../utilities/utilityFunctions')
+const {statusCodes, messages, secretKeys} = require ('../utilities/constants');
 
 const register = function(userData) {
     return new Promise((resolve,reject) => {
-        if(!userData.name) {
+        let result = fieldsValidate(userData);
+        if (result) {
             reject({
-                status : statusCodes.forbidden,
-                message: `Name ${messages.empty}`
-            })
-        }
-        if(!userData.password) {
-            reject({
-                status : statusCodes.forbidden,
-                message: `Password ${messages.notProvided}`
-            })
+                status : statusCodes.forBidden,
+                message : result
+            });
         }
         User.create({
             name: userData.name,
@@ -34,33 +30,32 @@ const register = function(userData) {
                     message: `Email ${messages.duplicate}`   
                 })
             }
-            reject({
-                status : statusCodes.forbidden,
-                message: `Email ${messages.invalid}`
-            })
+            reject({error})
         })
     })
 };
 
-const login = function(body){
+const login = function(body) {
     return new Promise((resolve, reject) => {
         User.findOne({email : body.email, deleted : false}).then((user) => {
-            if(!user) {
+            if (!user) {
                 reject({
                     status : statusCodes.notFound,
                     message : `User ${messages.notFound}`
                 });
             }
-            bcrypt.compare(body.password, user.password , (err,result) => {                
-                if(result) {
+            bcrypt.compare(body.password, user.password , (err,result) => {            
+                if (result) {
+                    const uuid = user.uuid;
+                    let token = jwt.sign({_id: uuid}, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
                         status : statusCodes.successful,
                         message : `Login ${messages.successful}`,
-                        data : user
+                        data : {user,token}
                     });
                 } else {
                     reject({
-                        status : statusCodes.forbidden,
+                        status : statusCodes.forBidden,
                         message : `Password ${messages.notMatch}`
                     });
                 }
@@ -68,7 +63,7 @@ const login = function(body){
         }).catch((error) => {
             reject({
                 status : statusCodes.badRequest,
-                message : messages.notMatch,
+                message : `Something ${messages.notMatch}`,
                 error
             });
         })
@@ -76,28 +71,38 @@ const login = function(body){
 };
 
 const updateUser = function (body) {
-    let error = fieldsValidator(body);
+    let result = fieldsValidate(body);
 
     return new Promise((resolve,reject) => {
-        if(error){
+        if (result) {
             reject({
-                status : statusCodes.forbidden,
-                message : error
+                status : statusCodes.forBidden,
+                message : result
             });
         } else {
-            User.findOneAndUpdate({_id : body.id, deleted : false}, body, {new: true}, (err, doc) => {
-                if (doc) {
+            User.findOneAndUpdate({uuid : body.uuid, deleted : false}, body, {new: true}).then((user) => {
+                if (user) {
                     resolve({
                         status : statusCodes.successful,
                         message : `User ${messages.updated}`, 
-                        data : doc
-                    });
-                } else {
-                    reject({
-                        status : statusCodes.notFound,
-                        message : `User ${messages.notFound}`
+                        data : user
                     });
                 }
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }).catch((error) => {
+                if(error.code === 11000) {
+                    reject({
+                        status : statusCodes.forBidden,
+                        message : `Email ${messages.duplicate}`
+                    });
+                }
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
             })
         }
     })
