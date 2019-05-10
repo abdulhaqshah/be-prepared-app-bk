@@ -14,8 +14,9 @@ const findByToken = function(token,id,req) {
         }
         if (id === decoded._id) {
             resolve(User.findOne({uuid : id}));
+        } else {
+            reject({status : statusCodes.unauthorized, message : messages.unauthorized});
         }
-        reject({status : statusCodes.unauthorized, message : messages.unauthorized});
     })
 }
 const authenticate = (req, res, next) => {
@@ -26,12 +27,13 @@ const authenticate = (req, res, next) => {
             res.status(statusCodes.unauthorized).send({status : statusCodes.unauthorized, message : messages.unauthorized});
         } else {
             findByToken(token,id,req).then((user) => {
-                if(!user) {
+                if(user) {
+                    req.user = user;
+                    req.token = token;
+                    next();
+                } else {
                     res.status(statusCodes.unauthorized).send({status : statusCodes.unauthorized, message : messages.unauthorized});
                 }
-                req.user = user;
-                req.token = token;
-                next();
             }).catch((err) => {
                 res.status(statusCodes.unauthorized).send({status : statusCodes.unauthorized, message : messages.unauthorized});
             });
