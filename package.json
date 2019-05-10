@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
-    "expect": "^24.7.1"
+    "expect": "^24.7.1",
+    "superagent-defaults": "^0.1.14"
   }
 }
