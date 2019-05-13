@@ -18,32 +18,20 @@ const users = [{
     password : 'password345'
 }]
 
-const populateUsers = done => { //eslint-disable-line
-    User.remove({}).then(() => {
+const populateUsers = () => {
+    return User.remove({}).then(() => {
         let userOne = new User(users[0]).save();
         let userTwo = new User(users[1]).save();
         return Promise.all([userOne, userTwo]);
-    }).then(() => done()); //eslint-disable-line
+    })
 };
 
-const setUuid = (index) => {
-    return new Promise((resolve,reject) => {
-        User.findById(users[index]._id).then((user) => {
-            if (user) {
-                users[index].uuid = user.uuid;
-                resolve();
-            } else {
-                reject('NO user found');
-            }
-        })
-    })
-}
-
-const setPayload = index => {
+const setPayload = uuid => {
     return {
-        _id : users[index].uuid,
+        _id : uuid,
         it : Date.now()
     }
 }
 
-module.exports = {users, populateUsers, setUuid, setPayload};
+
+module.exports = {users, populateUsers, setPayload};
