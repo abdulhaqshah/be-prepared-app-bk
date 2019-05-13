@@ -12,7 +12,7 @@ router.post('/user/register', (req, res) => {
 });
 
 router.post('/user/login', (req,res) => {
-    userLibs.login(req.body).then((user) => {
+    userLibs.logIn(req.body).then((user) => {
         res.header('x-authentication', user.token).status(user.status).send(user);
     }).catch((error) => {
         res.status(error.status).send(error);

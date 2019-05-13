@@ -42,7 +42,7 @@ const register = function(userData) {
     })
 };
 
-const login = function(body) {
+const logIn = function(body) {
     return new Promise((resolve, reject) => {
         User.findOne({email : body.email, deleted : false}).then((user) => {
             if (!user) {
@@ -148,4 +148,4 @@ const logOut = function(request) {
     })
 }
 
-module.exports = {register, login, updateUser, logOut}
+module.exports = {register, logIn, updateUser, logOut}
