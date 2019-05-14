@@ -148,4 +148,30 @@ const logOut = function(request) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut}
+const deleteUser = function(request) {
+    let id = request.params.uuid;
+
+    return new Promise((resolve,reject) => {
+        User.findOneAndUpdate({uuid : id, deleted : false}, {$set : {deleted : true}}, {new : true}).then((user) => {
+            if(user) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.deleted}`, 
+                    data : user
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                data : error
+            });
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut, deleteUser}

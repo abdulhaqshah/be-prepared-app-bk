@@ -349,4 +349,27 @@ describe('POST /user/logout', () => {
         });
     });
 
-})
+});
+
+describe('DELETE /user/delete/:uuid', () => {
+    it('should delete the user', (done) => {
+        let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+        let uuid = userOne.uuid;
+
+        test
+        .delete(`/user/delete/${uuid}`)
+        .set('x-authentication', token)
+        .set('uuid', uuid)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.data.deleted).toBe(true);
+        })
+        .end((error) => {
+            if (error) {
+                done(error);
+            } else {
+                done();
+            }
+        })
+    });
+});

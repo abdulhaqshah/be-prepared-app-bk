@@ -21,7 +21,8 @@ const messages = {
     notProvided  : "not provided",
     unauthorized : "Unauthorized",
     wrong        : "Something went wrong",
-    logOut       : "has logout"
+    logOut       : "has logout",
+    deleted      : "has been deleted successfully"
 }
 
 const secretKeys = {
