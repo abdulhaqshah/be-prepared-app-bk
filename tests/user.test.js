@@ -352,6 +352,7 @@ describe('POST /user/logout', () => {
 });
 
 describe('DELETE /user/delete/:uuid', () => {
+    //it should delete the user if user is authenticated
     it('should delete the user', (done) => {
         let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
         let uuid = userOne.uuid;
@@ -371,5 +372,23 @@ describe('DELETE /user/delete/:uuid', () => {
                 done();
             }
         })
+    });
+
+    it('should not delete the user' , (done) => {
+        let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+        let uuid = userOne.uuid;
+
+        test
+        .delete(`/user/delete/${uuid}1`)
+        .set('x-authentication', token)
+        .set('uuid', uuid)
+        .expect(404)
+        .end((err,res) => {
+            if(err){
+                return done(err);
+            }
+            expect(res.text).toBe(JSON.stringify({status : '404', message : "User has not been found"}));
+            done(); 
+        });
     });
 });
