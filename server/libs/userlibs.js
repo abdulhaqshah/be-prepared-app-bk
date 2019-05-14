@@ -150,7 +150,6 @@ const logOut = function(request) {
 
 const deleteUser = function(request) {
     let id = request.params.uuid;
-
     return new Promise((resolve,reject) => {
         User.findOneAndUpdate({uuid : id, deleted : false}, {$set : {deleted : true}}, {new : true}).then((user) => {
             if(user) {
