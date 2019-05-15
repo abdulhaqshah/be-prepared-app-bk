@@ -35,8 +35,20 @@ router.post('/user/logout', authenticate, (req,res) => {
     })
 })
 
-router.delete('/user/delete/:uuid', authenticate, (req,res) => {
+router.delete('/admin/delete/:uuid', authenticate, (req,res) => {
     userLibs.deleteUser(req).then((success) => {
+        res.status(success.status).send(success);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.delete('/user/delete/:uuid', authenticate, (req,res) => {
+    let body = {
+        uuid : req.params.uuid,
+        token : req.header('x-authentication')
+    }
+    userLibs.userDelete(body).then((success) => {
         res.status(success.status).send(success);
     }).catch((error) => {
         res.status(error.status).send(error);

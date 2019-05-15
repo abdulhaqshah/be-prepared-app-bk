@@ -44,7 +44,7 @@ const register = function(userData) {
 
 const logIn = function(body) {
     return new Promise((resolve, reject) => {
-        User.findOne({email : body.email, deleted : false}).then((user) => {
+        User.findOne({email : body.email, deActive : false}).then((user) => {
             if (!user) {
                 reject({
                     status : statusCodes.notFound,
@@ -91,7 +91,8 @@ const updateUser = function (body) {
                 message : result
             });
         } else {
-            User.findOneAndUpdate({uuid : body.uuid, deleted : false}, body, {new: true}).then((user) => {
+            body.updatedAt = Date.now();
+            User.findOneAndUpdate({uuid : body.uuid, deActive : false}, body, {new: true}).then((user) => {
                 if (user) {
                     resolve({
                         status : statusCodes.successful,
@@ -130,7 +131,8 @@ const logOut = function(request) {
         }
         Token.create({
             token,
-            createdAt : decoded.it      
+            createdAt : decoded.it,
+            expire_at : decoded.it + 172800000     
         }).then((token) => {
             if (token) {
                 resolve({
@@ -151,13 +153,39 @@ const logOut = function(request) {
 const deleteUser = function(request) {
     let id = request.params.uuid;
     return new Promise((resolve,reject) => {
-        User.findOneAndUpdate({uuid : id, deleted : false}, {$set : {deleted : true}}, {new : true}).then((user) => {
-            if(user) {
-                resolve({
-                    status : statusCodes.successful,
-                    message : `User ${messages.deleted}`, 
-                    data : user
-                });
+        User.findOne({uuid : id}).then((user) => {
+            if (user) {
+                if (user.admin) {
+                    let query = {
+                        deActive : true,
+                        deletedAt : Date.now(),
+                        deletedBy : user.email
+                    }
+                    User.findOneAndUpdate({uuid : id, deActive : false}, query, {new : true}).then((user) => {
+                        if(user) {
+                            resolve({
+                                status : statusCodes.successful,
+                                message : `User ${messages.deleted}`, 
+                                data : user
+                            });
+                        } else {
+                            reject({
+                                status : statusCodes.notFound,
+                                message : `User ${messages.notFound}`
+                            });
+                        }
+                    }).catch((error) => {
+                        reject({
+                            status : statusCodes.badRequest,
+                            data : error
+                        });
+                    })
+                } else {
+                    reject({
+                        status : statusCodes.forBidden,
+                        message : `User ${messages.notAdmin}`
+                    });
+                }
             } else {
                 reject({
                     status : statusCodes.notFound,
@@ -173,4 +201,49 @@ const deleteUser = function(request) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut, deleteUser}
+const userDelete = function(body) {
+    let id = body.uuid;
+    return new Promise((resolve,reject) => {
+        User.findOneAndDelete({uuid : id, deActive : false}).then((user) => {
+            if (user) {
+                let decoded = {};
+                try {
+                    decoded = jwt.verify(body.token, secretKeys.tokenKey, process.env.JWT_SECRET);
+                } catch (error) {
+                    reject(error);
+                }
+                Token.create({
+                    token : body.token,
+                    createdAt : decoded.it,
+                    expire_at : decoded.it + 172800000       
+                }).then((token) => {
+                    if (token) {
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `User ${messages.deleted}`, 
+                            data : user
+                        });
+                    }
+                    reject({
+                        status : statusCodes.badRequest,
+                        message: `${messages.wrong}`   
+                    })
+                }).catch((error) => {
+                    reject({error});
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                data : error
+            });
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut, userDelete, deleteUser}

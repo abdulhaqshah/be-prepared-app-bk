@@ -10,12 +10,14 @@ const users = [{
     _id : userOneID,
     name : 'Andrew',
     email : 'andrew@example.com',
-    password : 'password123'
+    password : 'password123',
+    admin : false
 },{
     _id : userTwoID,
     name : 'Jen',
     email : 'jen@example.com',
-    password : 'password345'
+    password : 'password345',
+    admin : false
 }]
 
 const populateUsers = () => {
