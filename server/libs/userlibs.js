@@ -148,4 +148,35 @@ const logOut = function(request) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut}
+const changePassword = function(request) {
+    let body = request.body;
+    return new Promise((resolve,reject) => {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(body.password, salt, (err,hash) => {
+                body.password = hash;
+                User.findOneAndUpdate({uuid : body.uuid, deleted : false}, {$set : {password : body.password}}, {new: true}).then((user) => {
+                    if (user) {
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `Password ${messages.updated}`, 
+                            data : user
+                        });
+                    } else {
+                        reject({
+                            status : statusCodes.notFound,
+                            message : `User ${messages.notFound}`
+                        });
+                    }
+                }).catch((error) => {
+                    reject({
+                        status : statusCodes.badRequest,
+                        data : error   
+                    })
+                })
+
+            })
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword}
