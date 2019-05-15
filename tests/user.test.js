@@ -46,7 +46,6 @@ describe('POST /user/register' , () => {
                 expect(user.password).not.toBe(password);
                 done();
             });
-
         });
     });
 
@@ -362,18 +361,17 @@ describe('DELETE /user/delete/:uuid', () => {
         .set('x-authentication', token)
         .set('uuid', uuid)
         .expect(200)
-        .expect((res) => {
-            expect(res.body.data.deleted).toBe(true);
-        })
-        .end((error) => {
-            if (error) {
-                done(error);
-            } else {
-                done();
+        .end((err) => {
+            if(err){
+                return done(err);
             }
-        })
+            User.findOne({uuid}).then((user) => {
+                expect(user).toBeFalsy();
+                done();
+            });
+        });
     });
-
+    //it should not delete the user if user is not found
     it('should not delete the user' , (done) => {
         let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
         let uuid = userOne.uuid;
@@ -388,6 +386,24 @@ describe('DELETE /user/delete/:uuid', () => {
                 return done(err);
             }
             expect(res.text).toBe(JSON.stringify({status : '404', message : "User has not been found"}));
+            done(); 
+        });
+    });
+    //it should not delete user if user is not authenticated
+    it('should not delete the user' , (done) => {
+        let token = jwt.sign(setPayload(userOne.uuid + '1'), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+        let uuid = userOne.uuid;
+
+        test
+        .delete(`/user/delete/${uuid}`)
+        .set('x-authentication', token)
+        .set('uuid', uuid)
+        .expect(401)
+        .end((err,res) => {
+            if(err){
+                return done(err);
+            }
+            expect(res.text).toBe(JSON.stringify({status : '401', message : "Unauthorized"}));
             done(); 
         });
     });

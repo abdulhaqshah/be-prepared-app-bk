@@ -5,7 +5,8 @@ let TokensSchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    expire_at: {type: Date, expires: 172800, default: Date.now}
+    createdAt : {type: Date, default: Date.now},
+    expire_at: {type: Date, default: Date.now}
 });
 
 module.exports = mongoose.model('Token', TokensSchema);
