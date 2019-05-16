@@ -62,7 +62,7 @@
         "consistent-this": "off",
         "curly": "error",
         "default-case": "error",
-        "dot-location": "error",
+        "dot-location": "off",
         "dot-notation": [
             "error",
             {
