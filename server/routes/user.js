@@ -28,15 +28,19 @@ router.patch('/user/userUpdate', authenticate, (req,res) => {
 });
 
 router.post('/user/logout', authenticate, (req,res) => {
-    userLibs.logOut(req).then((success) => {
+    let token = req.header('x-authentication');
+    userLibs.logOut(token).then((success) => {
         res.status(success.status).send(success);
     }).catch((error) => {
         res.status(error.status).send(error);
     })
 })
 
-router.delete('/admin/delete/:uuid', authenticate, (req,res) => {
-    userLibs.deleteUser(req).then((success) => {
+router.delete('/admin/deactivate/:uuid', authenticate, (req,res) => {
+    let body = {
+        uuid : req.params.uuid
+    }
+    userLibs.adminDeActivateUser(body).then((success) => {
         res.status(success.status).send(success);
     }).catch((error) => {
         res.status(error.status).send(error);

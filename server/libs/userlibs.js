@@ -3,7 +3,7 @@ const Token = require('../DataBase/models/tokens');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {fieldsValidate} = require('./../utilities/utilityFunctions')
-const {statusCodes, messages, secretKeys} = require ('../utilities/constants');
+const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
 
 const register = function(userData) {
     return new Promise((resolve,reject) => {
@@ -44,7 +44,7 @@ const register = function(userData) {
 
 const logIn = function(body) {
     return new Promise((resolve, reject) => {
-        User.findOne({email : body.email, deActive : false}).then((user) => {
+        User.findOne({email : body.email, deActivate : false}).then((user) => {
             if (!user) {
                 reject({
                     status : statusCodes.notFound,
@@ -92,7 +92,7 @@ const updateUser = function (body) {
             });
         } else {
             body.updatedAt = Date.now();
-            User.findOneAndUpdate({uuid : body.uuid, deActive : false}, body, {new: true}).then((user) => {
+            User.findOneAndUpdate({uuid : body.uuid, deActivate : false}, body, {new: true}).then((user) => {
                 if (user) {
                     resolve({
                         status : statusCodes.successful,
@@ -120,9 +120,8 @@ const updateUser = function (body) {
     })
 };
 
-const logOut = function(request) {
+const logOut = function(token) {
     return new Promise((resolve,reject) => {
-        let token = request.header('x-authentication');
         let decoded = {};
         try {
             decoded = jwt.verify(token, secretKeys.tokenKey, process.env.JWT_SECRET);
@@ -132,7 +131,7 @@ const logOut = function(request) {
         Token.create({
             token,
             createdAt : decoded.it,
-            expire_at : decoded.it + 172800000     
+            expire_at : decoded.it + timeScale.twoDays    
         }).then((token) => {
             if (token) {
                 resolve({
@@ -150,18 +149,18 @@ const logOut = function(request) {
     })
 }
 
-const deleteUser = function(request) {
-    let id = request.params.uuid;
+const adminDeActivateUser = function(body) {
+    let id = body.uuid;
     return new Promise((resolve,reject) => {
         User.findOne({uuid : id}).then((user) => {
             if (user) {
-                if (user.admin) {
+                if (user.isAdmin) {
                     let query = {
-                        deActive : true,
+                        deActivate : true,
                         deletedAt : Date.now(),
                         deletedBy : user.email
                     }
-                    User.findOneAndUpdate({uuid : id, deActive : false}, query, {new : true}).then((user) => {
+                    User.findOneAndUpdate({uuid : id, deActivate : false}, query, {new : true}).then((user) => {
                         if(user) {
                             resolve({
                                 status : statusCodes.successful,
@@ -204,7 +203,7 @@ const deleteUser = function(request) {
 const userDelete = function(body) {
     let id = body.uuid;
     return new Promise((resolve,reject) => {
-        User.findOneAndDelete({uuid : id, deActive : false}).then((user) => {
+        User.findOneAndDelete({uuid : id, deActivate : false}).then((user) => {
             if (user) {
                 let decoded = {};
                 try {
@@ -215,7 +214,7 @@ const userDelete = function(body) {
                 Token.create({
                     token : body.token,
                     createdAt : decoded.it,
-                    expire_at : decoded.it + 172800000       
+                    expire_at : decoded.it + timeScale.twoDays      
                 }).then((token) => {
                     if (token) {
                         resolve({
@@ -246,4 +245,4 @@ const userDelete = function(body) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut, userDelete, deleteUser}
+module.exports = {register, logIn, updateUser, logOut, userDelete, adminDeActivateUser}

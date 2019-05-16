@@ -30,4 +30,8 @@ const secretKeys = {
     tokenKey : 'I am a key for authentication token'
 }
 
-module.exports = {statusCodes, messages, secretKeys}
+const timeScale = {
+    twoDays : 172800000
+}
+
+module.exports = {statusCodes, messages, secretKeys, timeScale}
