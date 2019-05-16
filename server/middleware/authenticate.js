@@ -2,12 +2,12 @@ let User = require('./../DataBase/models/user');
 let Token = require('./../DataBase/models/tokens');
 const jwt = require('jsonwebtoken');
 const {statusCodes, messages, secretKeys} = require ('../utilities/constants');
-const {isEmpty, decode} = require('./../utilities/utilityFunctions');
+const {isEmpty, decodeToken} = require('./../utilities/utilityFunctions');
 
 const findByToken = function(token,id,req) {
     let decoded = {};
     return new Promise((resolve,reject) => {
-        decoded = decode(token);
+        decoded = decodeToken(token);
         if (id === decoded._id) {
             resolve(User.findOne({uuid : id}));
         } else {
