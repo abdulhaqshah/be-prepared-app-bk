@@ -36,7 +36,7 @@ router.post('/user/logout', authenticate, (req,res) => {
     })
 })
 
-router.delete('/admin/deactivate/:uuid', authenticate, (req,res) => {
+router.delete('/user/deactivate/:uuid', authenticate, (req,res) => {
     let body = {
         uuid : req.params.uuid
     }

@@ -37,8 +37,8 @@ let UserSchema = new mongoose.Schema({
         score : {type : Number, default : 0}
     }],
     deActivate : {type : Boolean, default : false},
-    deletedAt : {type : Date, default : null},
-    deletedBy : {type : String, default : ''},
+    deActivatedAt : {type : Date, default : null},
+    deActivatedBy : {type : String, default : ''},
     updatedAt : {type : Date, default : Date.now},
     isAdmin : {type : Boolean, default : false},
     image: {type : String, default : "images/container-bg.png"}

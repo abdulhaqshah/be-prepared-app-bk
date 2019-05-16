@@ -25,7 +25,7 @@ const isEmpty = (obj) => {
     return true;
 }
 
-const decode = (token) => {
+const decodeToken = (token) => {
     let decoded = {};
     try {
         decoded = jwt.verify(token, secretKeys.tokenKey, process.env.JWT_SECRET);
@@ -36,4 +36,4 @@ const decode = (token) => {
 }
 
 
-module.exports = {fieldsValidate, isEmpty, decode};
+module.exports = {fieldsValidate, isEmpty, decodeToken};

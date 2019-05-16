@@ -1,11 +1,11 @@
 const User = require ('../DataBase/models/user');
-const Token = require('../DataBase/models/tokens');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {fieldsValidate, decode} = require('./../utilities/utilityFunctions')
+const {fieldsValidate, decodeToken} = require('./../utilities/utilityFunctions');
+const {createToken} = require('./tokenlibs');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
 
-const register = function(userData) {
+const register = function (userData) {
     return new Promise((resolve,reject) => {
         let result = fieldsValidate(userData);
         if (result) {
@@ -42,32 +42,9 @@ const register = function(userData) {
     })
 };
 
-const createToken = function(token, it) {
-    return new Promise((resolve, reject) => {
-        Token.create({
-            token,
-            createdAt : it,
-            expire_at : it + timeScale.twoDays    
-        }).then((token) => {
-            if (token) {
-                resolve(token);
-            }
-            reject({
-                status : statusCodes.badRequest,
-                message: `${messages.wrong}`   
-            })
-        }).catch((error) => {
-            reject({
-                status : statusCodes.badRequest,
-                data : error
-            });
-        })
-    })
-}
-
-const getUser = function(object) {
+const getUser = function (query) {
     return new Promise((resolve,reject) => {
-        User.findOne(object).then((user) => {
+        User.findOne(query).then((user) => {
             if (user) {
                 resolve(user);
             } else {
@@ -84,7 +61,7 @@ const getUser = function(object) {
         })
     })
 }
-const logIn = function(body) {
+const logIn = function (body) {
     return new Promise((resolve, reject) => {
         let query = {
             email : body.email,
@@ -155,9 +132,9 @@ const updateUser = function (body) {
     })
 };
 
-const logOut = function(token) {
+const logOut = function (token) {
     return new Promise((resolve,reject) => {
-        let decoded = decode(token);
+        let decoded = decodeToken(token);
         createToken(token,decoded.it).then((token) => {
             resolve({
                 status : statusCodes.successful,
@@ -169,7 +146,7 @@ const logOut = function(token) {
     })
 }
 
-const deActivateUser = function(body) {
+const deActivateUser = function (body) {
     return new Promise((resolve,reject) => {
         let query = {
             uuid : body.uuid
@@ -178,8 +155,8 @@ const deActivateUser = function(body) {
             if (user.isAdmin) {
                 let query = {
                     deActivate : true,
-                    deletedAt : Date.now(),
-                    deletedBy : user.email
+                    deActivatedAt : Date.now(),
+                    deActivatedBy : user.email
                 }
                 User.findOneAndUpdate({uuid : body.uuid, deActivate : false}, query, {new : true})
                 .then((user) => {
@@ -212,12 +189,12 @@ const deActivateUser = function(body) {
     })
 }
 
-const deleteUser = function(body) {
+const deleteUser = function (body) {
     let id = body.uuid;
     return new Promise((resolve,reject) => {
         User.findOneAndDelete({uuid : id, deActivate : false}).then((user) => {
             if (user) {
-                let decoded = decode(body.token);
+                let decoded = decodeToken(body.token);
                 createToken(body.token, decoded.it).then((token) => {
                     resolve({
                         status : statusCodes.successful,
