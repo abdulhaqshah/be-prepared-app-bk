@@ -23,7 +23,8 @@ const messages = {
     wrong        : "Something went wrong",
     logOut       : "has logout",
     deleted      : "has been deleted successfully",
-    notAdmin     : "is not an admin"
+    notAdmin     : "is not an admin",
+    deActivated  : "has been de-activated"
 }
 
 const secretKeys = {

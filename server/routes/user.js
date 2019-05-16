@@ -40,7 +40,7 @@ router.delete('/admin/deactivate/:uuid', authenticate, (req,res) => {
     let body = {
         uuid : req.params.uuid
     }
-    userLibs.adminDeActivateUser(body).then((success) => {
+    userLibs.deActivateUser(body).then((success) => {
         res.status(success.status).send(success);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -52,7 +52,7 @@ router.delete('/user/delete/:uuid', authenticate, (req,res) => {
         uuid : req.params.uuid,
         token : req.header('x-authentication')
     }
-    userLibs.userDelete(body).then((success) => {
+    userLibs.deleteUser(body).then((success) => {
         res.status(success.status).send(success);
     }).catch((error) => {
         res.status(error.status).send(error);

@@ -1,6 +1,7 @@
 const validator = require ('validator');
-const {messages} = require ('./constants');
-const User = require ('./../DataBase/models/user')
+const User = require ('./../DataBase/models/user');
+const jwt = require('jsonwebtoken');
+const {statusCodes, messages, secretKeys} = require ('./constants');
 
 const fieldsValidate = (object) => {
     if (("name" in object) && !(object.name)) {
@@ -24,5 +25,15 @@ const isEmpty = (obj) => {
     return true;
 }
 
+const decode = (token) => {
+    let decoded = {};
+    try {
+        decoded = jwt.verify(token, secretKeys.tokenKey, process.env.JWT_SECRET);
+    } catch (error) {
+        return(error);
+    }
+    return decoded;
+}
 
-module.exports = {fieldsValidate, isEmpty};
+
+module.exports = {fieldsValidate, isEmpty, decode};

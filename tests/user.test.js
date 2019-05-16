@@ -377,7 +377,7 @@ describe('DELETE /user/delete/:uuid', () => {
         let uuid = userOne.uuid;
 
         test
-        .delete(`/user/delete/${uuid}1`)
+        .delete(`/user/delete/${uuid}1ca`)
         .set('x-authentication', token)
         .set('uuid', uuid)
         .expect(404)
