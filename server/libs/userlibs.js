@@ -131,7 +131,8 @@ const updateUser = function (body) {
                 if (user) {
                     resolve({
                         status : statusCodes.successful,
-                        message : `User ${messages.updated}`
+                        message : `User ${messages.updated}`,
+                        data : user
                     });
                 }
                 reject({
