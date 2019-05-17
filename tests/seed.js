@@ -31,7 +31,7 @@ const populateUsers = () => {
 const setPayload = uuid => {
     return {
         _id : uuid,
-        it : Date.now()
+        createdTime : Date.now()
     }
 }
 
