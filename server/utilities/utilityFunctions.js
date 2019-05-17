@@ -3,7 +3,7 @@ const User = require ('./../DataBase/models/user');
 const jwt = require('jsonwebtoken');
 const {statusCodes, messages, secretKeys} = require ('./constants');
 
-const fieldsValidate = (object) => {
+const validateFields = (object) => {
     if (("name" in object) && !(object.name)) {
         return `Name ${messages.empty}`;
     }
@@ -36,4 +36,4 @@ const decodeToken = (token) => {
 }
 
 
-module.exports = {fieldsValidate, isEmpty, decodeToken};
+module.exports = {validateFields, isEmpty, decodeToken};
