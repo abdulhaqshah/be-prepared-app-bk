@@ -7,11 +7,11 @@ const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/co
 
 const register = function (userData) {
     return new Promise((resolve,reject) => {
-        let result = fieldsValidate(userData);
-        if (result) {
+        let isErrorMessage = fieldsValidate(userData);
+        if (isErrorMessage) {
             reject({
                 status : statusCodes.forBidden,
-                message : result
+                message : isErrorMessage
             });
         }
         User.create({
@@ -98,12 +98,12 @@ const logIn = function (body) {
 };
 
 const updateUser = function (body) {
-    let result = fieldsValidate(body);
+    let isErrorMessage = fieldsValidate(body);
     return new Promise((resolve,reject) => {
-        if (result) {
+        if (isErrorMessage) {
             reject({
                 status : statusCodes.forBidden,
-                message : result
+                message : isErrorMessage
             });
         } else {
             body.updatedAt = Date.now();
@@ -222,4 +222,4 @@ const deleteUser = function (body) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut, deleteUser, deActivateUser}
+module.exports = {register, logIn, updateUser, logOut, deleteUser, deActivateUser, getUser}
