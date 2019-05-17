@@ -358,9 +358,7 @@ describe('POST /user/changePassword', () => {
         .send({uuid,password})
         .expect(200)
         .expect((res) => {
-            expect(res.body.data.uuid).toBeTruthy();
-            expect(res.body.data._id).toBeTruthy();
-            expect(res.body.data.password).not.toBe(password);
+            expect(res.body.data).toBe(password);
         })
         .end((error) => {
             if(error){

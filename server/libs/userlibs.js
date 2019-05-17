@@ -221,18 +221,18 @@ const deleteUser = function (body) {
         })
     })
 }
-const changePassword = function(request) {
-    let body = request.body;
+const changePassword = function(data) {
     return new Promise((resolve,reject) => {
         bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(body.password, salt, (err,hash) => {
-                body.password = hash;
-                User.findOneAndUpdate({uuid : body.uuid, deleted : false}, {$set : {password : body.password}}, {new: true}).then((user) => {
+            bcrypt.hash(data.password, salt, (err,hash) => {
+                let newPassword = hash;
+                User.findOneAndUpdate({uuid : data.uuid, deActivate : false}, {$set : {password : newPassword}}, {new: true})
+                .then((user) => {
                     if (user) {
                         resolve({
                             status : statusCodes.successful,
                             message : `Password ${messages.updated}`, 
-                            data : user
+                            data : data.password
                         });
                     } else {
                         reject({
@@ -243,7 +243,7 @@ const changePassword = function(request) {
                 }).catch((error) => {
                     reject({
                         status : statusCodes.badRequest,
-                        data : error   
+                        error   
                     })
                 })
 
