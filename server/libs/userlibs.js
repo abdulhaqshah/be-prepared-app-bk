@@ -221,5 +221,35 @@ const deleteUser = function (body) {
         })
     })
 }
+const changePassword = function(data) {
+    return new Promise((resolve,reject) => {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(data.password, salt, (err,hash) => {
+                let newPassword = hash;
+                User.findOneAndUpdate({uuid : data.uuid, deActivate : false}, {$set : {password : newPassword}}, {new: true})
+                .then((user) => {
+                    if (user) {
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `Password ${messages.updated}`, 
+                            data : data.password
+                        });
+                    } else {
+                        reject({
+                            status : statusCodes.notFound,
+                            message : `User ${messages.notFound}`
+                        });
+                    }
+                }).catch((error) => {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error   
+                    })
+                })
 
-module.exports = {register, logIn, updateUser, logOut, deleteUser, deActivateUser, getUser}
+            })
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser}

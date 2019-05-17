@@ -195,7 +195,6 @@ describe('PATCH /user/userUpdate', () => {
     it('should update the user with the changes provided given that user id is valid and existing', (done) => {
         let uuid = userOne.uuid;
         let name = 'Asaad';
-        let access = 'authentication';
         let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
 
         test
@@ -222,7 +221,6 @@ describe('PATCH /user/userUpdate', () => {
         let uuid = userTwo.uuid;
         let name = '';
         let email = 'asad@example.com';
-        let access = 'authentication';
         let token = jwt.sign(setPayload(userTwo.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
 
         test
@@ -244,7 +242,6 @@ describe('PATCH /user/userUpdate', () => {
     it('should reject update if id is invalid or not existing' , (done) =>{
         let uuid = userTwo.uuid + 1;
         let email = 'asad@example.com';
-        let access = 'authentication';
         let token = jwt.sign(setPayload(userTwo.uuid)+'1', secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
 
         test
@@ -266,7 +263,6 @@ describe('PATCH /user/userUpdate', () => {
     it('should reject update if email is invalid' , (done) => {
         let uuid = userTwo.uuid;
         let email = 'asad';
-        let access = 'authentication';
         let token = jwt.sign(setPayload(userTwo.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
 
         test
@@ -288,7 +284,6 @@ describe('PATCH /user/userUpdate', () => {
     it('should reject update if email is already in use' , (done) => {
         let uuid = userTwo.uuid;
         let email = users[0].email;
-        let access = 'authentication';
         let token = jwt.sign(setPayload(userTwo.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
 
         test
@@ -345,6 +340,53 @@ describe('POST /user/logout', () => {
             }
             expect(res.text).toBe(JSON.stringify({status : '401', message : "Unauthorized"}));
             done(); 
+        });
+    });
+});
+
+describe('POST /user/changePassword', () => {
+    //it should update the user's password after authenticating
+    it('should update the password', (done) => {
+        let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+        let uuid = userOne.uuid;
+        let password = "passwordchange";
+
+        test
+        .post('/user/changePassword')
+        .set('x-authentication', token)
+        .set('uuid', uuid)
+        .send({uuid,password})
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.data).toBe(password);
+        })
+        .end((error) => {
+            if(error){
+                done(error);
+            } else {
+                done();
+            }
+        })
+    })
+
+    //it should not update the passowrd for the user which is not found
+    it('should not update the password', (done) => {
+        let token = jwt.sign(setPayload(userOne.uuid), secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+        let uuid = userOne.uuid + '1';
+        let password = "passwordchange";
+
+        test
+        .post('/user/changePassword')
+        .set('x-authentication', token)
+        .set('uuid', userOne.uuid)
+        .send({uuid,password})
+        .expect(404)
+        .end((err,res) => {
+            if(err){
+                return done(err);
+            }
+            expect(res.text).toBe(JSON.stringify({status : '404', message : "User has not been found"}));
+            done();
         });
     });
 
