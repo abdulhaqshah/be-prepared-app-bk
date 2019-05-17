@@ -1,17 +1,17 @@
 const User = require ('../DataBase/models/user');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {fieldsValidate, decodeToken} = require('./../utilities/utilityFunctions');
+const {validateFields, decodeToken} = require('./../utilities/utilityFunctions');
 const {createToken} = require('./tokenlibs');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
 
 const register = function (userData) {
     return new Promise((resolve,reject) => {
-        let isErrorMessage = fieldsValidate(userData);
-        if (isErrorMessage) {
+        let isValidated = validateFields(userData);
+        if (isValidated) {
             reject({
                 status : statusCodes.forBidden,
-                message : isErrorMessage
+                message : isValidated
             });
         }
         User.create({
@@ -98,12 +98,12 @@ const logIn = function (body) {
 };
 
 const updateUser = function (body) {
-    let isErrorMessage = fieldsValidate(body);
+    let isValidated = validateFields(body);
     return new Promise((resolve,reject) => {
-        if (isErrorMessage) {
+        if (isValidated) {
             reject({
                 status : statusCodes.forBidden,
-                message : isErrorMessage
+                message : isValidated
             });
         } else {
             body.updatedAt = Date.now();
