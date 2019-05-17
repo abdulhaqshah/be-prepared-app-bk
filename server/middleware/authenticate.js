@@ -3,13 +3,20 @@ let Token = require('./../DataBase/models/tokens');
 const jwt = require('jsonwebtoken');
 const {statusCodes, messages, secretKeys} = require ('../utilities/constants');
 const {isEmpty, decodeToken} = require('./../utilities/utilityFunctions');
+const {getUser} = require('./../libs/userlibs');
 
 const findByToken = function(token,id,req) {
-    let decoded = {};
     return new Promise((resolve,reject) => {
-        decoded = decodeToken(token);
+        let decoded = decodeToken(token);
         if (id === decoded._id) {
-            resolve(User.findOne({uuid : id}));
+            let query = {
+                uuid : id
+            }
+            getUser(query).then((user) => {
+                resolve(user);
+            }).catch((error) => {
+                reject(error);
+            });
         } else {
             reject({status : statusCodes.unauthorized, message : messages.unauthorized});
         }
