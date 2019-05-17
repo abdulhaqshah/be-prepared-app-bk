@@ -1,12 +1,12 @@
 const Token = require('../DataBase/models/tokens');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
 
-const createToken = function (token, it) {
+const createToken = function (token, createdTime) {
     return new Promise((resolve, reject) => {
         Token.create({
             token,
-            createdAt : it,
-            expire_at : it + timeScale.twoDays    
+            createdAt : createdTime,
+            expire_at : createdTime + timeScale.twoDays    
         }).then((token) => {
             if (token) {
                 resolve(token);
@@ -18,7 +18,7 @@ const createToken = function (token, it) {
         }).catch((error) => {
             reject({
                 status : statusCodes.badRequest,
-                data : error
+                error
             });
         })
     })

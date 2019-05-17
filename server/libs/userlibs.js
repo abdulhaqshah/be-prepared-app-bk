@@ -37,7 +37,10 @@ const register = function (userData) {
                     message: `Email ${messages.duplicate}`   
                 })
             }
-            reject({error})
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
         })
     })
 };
@@ -56,7 +59,7 @@ const getUser = function (query) {
         }).catch((error) => {
             reject({
                 status : statusCodes.badRequest,
-                data : error
+                error
             });
         })
     })
@@ -73,7 +76,7 @@ const logIn = function (body) {
                     const uuid = user.uuid;
                     let payload = {
                         _id : uuid,
-                        it : Date.now()
+                        createdTime : Date.now()
                     }
                     let token = jwt.sign(payload, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
                     resolve({
@@ -135,7 +138,7 @@ const updateUser = function (body) {
 const logOut = function (token) {
     return new Promise((resolve,reject) => {
         let decoded = decodeToken(token);
-        createToken(token,decoded.it).then((token) => {
+        createToken(token,decoded.createdTime).then((token) => {
             resolve({
                 status : statusCodes.successful,
                 message : `User ${messages.logOut}`
@@ -174,7 +177,7 @@ const deActivateUser = function (body) {
                 }).catch((error) => {
                     reject({
                         status : statusCodes.badRequest,
-                        data : error
+                        error
                     });
                 })
             } else {
@@ -195,7 +198,7 @@ const deleteUser = function (body) {
         User.findOneAndDelete({uuid : id, deActivate : false}).then((user) => {
             if (user) {
                 let decoded = decodeToken(body.token);
-                createToken(body.token, decoded.it).then((token) => {
+                createToken(body.token, decoded.createdTime).then((token) => {
                     resolve({
                         status : statusCodes.successful,
                         message : `User ${messages.deleted}`
@@ -213,7 +216,7 @@ const deleteUser = function (body) {
         }).catch((error) => {
             reject({
                 status : statusCodes.badRequest,
-                data : error
+                error
             });
         })
     })
