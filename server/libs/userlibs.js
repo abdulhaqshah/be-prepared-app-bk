@@ -1,4 +1,5 @@
 const User = require ('../DataBase/models/user');
+const formidable = require('formidable');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {validateFields, decodeToken} = require('./../utilities/utilityFunctions');
@@ -252,4 +253,39 @@ const changePassword = function(data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser}
+const uploadPhoto = function(req, res) {
+    let id = req.params.uuid;
+    let form = new formidable.IncomingForm();
+    form.uploadDir = "public/images";
+    form.keepExtensions = true;
+    form.maxFieldsSize = 10 * 1024 * 1024;
+    return new Promise((resolve,reject) => {
+        form.parse(req, (error, fields, file) => {
+            if(error){
+                reject({
+                    status : statusCodes.badRequest,
+                    error
+                })
+            }
+            User.findOneAndUpdate({uuid : id}, {$set :{"image" : file.photo.path}}, {new: true}, (error, doc) => {
+                if (doc) {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Photo ${messages.updated}`, 
+                        data : {
+                            path : file.photo.path,
+                            type : file.photo.type
+                        }
+                    });
+                } else {
+                    reject({
+                        status : statusCodes.badRequest,
+                        data : 'error'   
+                    })
+                }
+            })
+        })
+    })
+};
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto}
