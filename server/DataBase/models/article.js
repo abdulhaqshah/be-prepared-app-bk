@@ -18,8 +18,8 @@ let articleSchema = new mongoose.Schema({
     },
     article : {type : String},
     comments : [{
-        type : String,
-        commentedBy : String
+        comment : {type : String},
+        commentedBy : {type : String}
     }]
 });
 
