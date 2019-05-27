@@ -30,4 +30,13 @@ router.post('/course/addQuestion', (req, res) => {
     });
 });
 
+router.get('/course/getQuestionByType', (req, res) => {
+    let data = req.body;
+    courseLibs.getQuestionsByType(data).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+});
+
 module.exports = router;

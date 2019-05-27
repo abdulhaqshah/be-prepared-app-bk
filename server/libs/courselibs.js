@@ -1,5 +1,7 @@
+/*eslint-disable*/
 const Course = require('../DataBase/models/courses');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const {checkQuestionType} = require('../utilities/utilityFunctions')
 
 const createCourse = function (data) {
     return new Promise((resolve,reject) => {
@@ -76,4 +78,28 @@ const addQuestion = function (data) {
     });
 };
 
-module.exports = {createCourse, getCourse, addQuestion}
+const getQuestionsByType = function (data) {
+    return new Promise((resolve,reject) => {
+        Course.find({"questions.problemSolving" : data.problemSolving}).then((course) => {
+            if (course) {
+                let questions = checkQuestionType(course,data.problemSolving);
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Question ${messages.added}`,
+                    data : questions
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Course ${messages.notFound}`
+                })
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType}
