@@ -22,8 +22,7 @@ let CourseSchema = new mongoose.Schema({
         },
         question : {
             type : String,
-            required : true,
-            unique : true
+            required : true
         },
         options : [String],
         answer : {
