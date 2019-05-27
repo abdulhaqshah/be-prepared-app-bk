@@ -1,4 +1,3 @@
-/*eslint-disable*/
 const Course = require('../DataBase/models/courses');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
 const {checkQuestionType} = require('../utilities/utilityFunctions')
