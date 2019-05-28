@@ -1,17 +1,17 @@
-const Course = require('../DataBase/models/courses');
+const Quiz = require('../DataBase/models/quiz');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
 const {checkQuestionType} = require('../utilities/utilityFunctions')
 
-const createCourse = function (data) {
+const createQuiz = function (data) {
     return new Promise((resolve,reject) => {
-        Course.create({
+        Quiz.create({
             name : data.name
-        }).then((course) => {
-            if (course) {
+        }).then((quiz) => {
+            if (quiz) {
                 resolve({
                     status : statusCodes.created,
-                    message : `Course ${messages.created}`, 
-                    data : course
+                    message : `Quiz ${messages.created}`, 
+                    data : quiz
                 })
             } else {
                 reject({
@@ -28,19 +28,19 @@ const createCourse = function (data) {
     });
 };
 
-const getCourse = function (query) {
+const getQuiz = function (query) {
     return new Promise((resolve,reject) => {
-        Course.findOne(query).then((course) => {
-            if (course) {
+        Quiz.findOne(query).then((quiz) => {
+            if (quiz) {
                 resolve({
                     status : statusCodes.successful,
-                    message : `Course ${messages.found}`, 
-                    data : course
+                    message : `Quiz ${messages.found}`, 
+                    data : quiz
                 })
             } else {
                 reject({
                     status : statusCodes.notFound,
-                    message: `Course ${messages.notFound}`   
+                    message: `Quiz ${messages.notFound}`   
                 })
             }
         }).catch((error) => {
@@ -54,18 +54,18 @@ const getCourse = function (query) {
 
 const addQuestion = function (data) {
     return new Promise((resolve,reject) => {
-        Course.findOneAndUpdate({cid : data.cid}, {$push : {questions : data.question}}, {new : true})
-        .then((course) => {
-            if (course) {
+        Quiz.findOneAndUpdate({qid : data.qid}, {$push : {questions : data.question}}, {new : true})
+        .then((quiz) => {
+            if (quiz) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Question ${messages.added}`,
-                    data : course
+                    data : quiz
                 })
             } else {
                 reject({
                     status : statusCodes.notFound,
-                    message: `Course ${messages.notFound}`
+                    message: `Quiz ${messages.notFound}`
                 })
             }
         }).catch((error) => {
@@ -79,9 +79,9 @@ const addQuestion = function (data) {
 
 const getQuestionsByType = function (data) {
     return new Promise((resolve,reject) => {
-        Course.find({"questions.problemType" : data.problemType}).then((course) => {
-            if (course) {
-                let questions = checkQuestionType(course,data.problemType);
+        Quiz.find({"questions.problemType" : data.problemType}).then((quiz) => {
+            if (quiz) {
+                let questions = checkQuestionType(quiz,data.problemType);
                 resolve({
                     status : statusCodes.successful,
                     message : `Question ${messages.added}`,
@@ -90,7 +90,7 @@ const getQuestionsByType = function (data) {
             } else {
                 reject({
                     status : statusCodes.notFound,
-                    message: `Course ${messages.notFound}`
+                    message: `Quiz ${messages.notFound}`
                 })
             }
         }).catch((error) => {
@@ -101,4 +101,4 @@ const getQuestionsByType = function (data) {
         });
     })
 }
-module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType}
+module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType}

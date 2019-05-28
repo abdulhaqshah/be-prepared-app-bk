@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const uuidv4 = require('uuid/v4');
 
-let CourseSchema = new mongoose.Schema({
-    cid : {
+let QuizSchema = new mongoose.Schema({
+    qid : {
         type : String,
         unique : true
     },
@@ -13,17 +13,14 @@ let CourseSchema = new mongoose.Schema({
         unique : true
     },
     questions :[{
-        description : {
-            type : String,
-            required : true
-        },
-        problemType : {
+        problemType: {
             type : String
         },
         question : {
             type : String,
             required : true
         },
+        options : [String],
         answer : {
             type : String,
             required : true
@@ -32,10 +29,10 @@ let CourseSchema = new mongoose.Schema({
     likes : Number
 });
 
-CourseSchema.pre('save' , function(next) {
-    let course = this;
-    course.cid = uuidv4();
+QuizSchema.pre('save' , function(next) {
+    let quiz = this;
+    quiz.qid = uuidv4();
     next();
 });
 
-module.exports = mongoose.model('Course', CourseSchema);
+module.exports = mongoose.model('Quiz', QuizSchema);
