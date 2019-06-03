@@ -39,4 +39,36 @@ router.get('/quiz/getQuestionByType', (req, res) => {
     });
 });
 
+router.get('/quiz/getAllQuizzes', (req, res) => {
+    let query = {};
+    quizLibs.getQuiz(query).then((quizzes) => {
+        res.status(quizzes.status).send(quizzes);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.post('/quiz/addUser', (req, res) => {
+    let data = {
+        usersId : req.header('uuid'),
+        qid : req.body.qid
+    }
+    quizLibs.addUser(data).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.get('/quiz/getNumberOfUsers', (req, res) => {
+    let data = {
+        qid : req.body.qid
+    };
+    quizLibs.numberOfUsers(data).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 module.exports = router;

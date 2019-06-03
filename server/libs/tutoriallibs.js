@@ -1,5 +1,6 @@
 const Tutorial = require('../DataBase/models/tutorials');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const {checkUserId} = require('../utilities/utilityFunctions');
 
 const createTutorial = function (data) {
     return new Promise((resolve,reject) => {
@@ -11,12 +12,12 @@ const createTutorial = function (data) {
                     status : statusCodes.created,
                     message : `Course ${messages.created}`,
                     data : tutorial
-                })
+                });
             } else {
                 reject({
                     status : statusCodes.badRequest,
                     message: `${messages.wrong}`   
-                })
+                });
             }
         }).catch((error) => {
             reject({
@@ -29,18 +30,18 @@ const createTutorial = function (data) {
 
 const getTutorial = function (query) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOne(query).then((tutorial) => {
+        Tutorial.find(query).then((tutorial) => {
             if (tutorial) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Tutorial ${messages.found}`, 
                     data : tutorial
-                })
+                });
             } else {
                 reject({
                     status : statusCodes.notFound,
                     message: `Tutorial ${messages.notFound}`   
-                })
+                });
             }
         }).catch((error) => {
             reject({
@@ -60,12 +61,12 @@ const addTopic = function (data) {
                     status : statusCodes.successful,
                     message : `Topic ${messages.added}`,
                     data : tutorial
-                })
+                });
             } else {
                 reject({
                     status : statusCodes.notFound,
                     message: `Tutorial ${messages.notFound}`
-                })
+                });
             }
         }).catch((error) => {
             reject({
@@ -85,12 +86,12 @@ const addLesson = function (data) {
                     status : statusCodes.successful,
                     message : `Lesson ${messages.added}`,
                     data : tutorial
-                })
+                });
             } else {
                 reject({
                     status : statusCodes.notFound,
                     message: `Tutorial ${messages.notFound}`
-                })
+                });
             }
         }).catch((error) => {
             reject({
@@ -101,4 +102,65 @@ const addLesson = function (data) {
     });
 };
 
-module.exports = {createTutorial, getTutorial, addTopic, addLesson}
+const addUser = function (data) {
+    return new Promise((resolve, reject) => {
+        getTutorial({tid : data.tid}).then((tutorial) => {
+            if (tutorial) {
+                let found = checkUserId(tutorial.data, data.usersId);
+                if (found) {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error : `User ${messages.duplicate}`
+                    });
+                } else {
+                    Tutorial.findOneAndUpdate({tid : data.tid}, {$push : {usersIDs : data.usersId}}, {new : true})
+                    .then((tutorial) => {
+                        if (tutorial) {
+                            resolve({
+                                status : statusCodes.successful,
+                                message : `User ${messages.added}`,
+                                data : tutorial
+                            });
+                        } else {
+                            reject({
+                                status : statusCodes.notFound,
+                                message: `Tutorial ${messages.notFound}`
+                            });
+                        }
+                    }).catch((error) => {
+                        reject({
+                            status : statusCodes.badRequest,
+                            error
+                        });
+                    });
+                }
+            }
+        })
+    });
+};
+
+const numberOfUsers = function (data) {
+    return new Promise ((resolve,reject) => {
+        getTutorial(data).then((tutorial) => {
+            if (tutorial) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.added}`,
+                    numberOfUsers : tutorial.data[0].usersIDs.length
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Tutorial ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createTutorial, getTutorial, addTopic, addLesson, addUser, numberOfUsers}

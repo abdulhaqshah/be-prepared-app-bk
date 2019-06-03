@@ -29,7 +29,7 @@ let CourseSchema = new mongoose.Schema({
             required : true
         }
     }],
-    likes : Number
+    usersIDs : [String]
 });
 
 CourseSchema.pre('save' , function(next) {
