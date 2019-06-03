@@ -38,4 +38,36 @@ router.post('/tutorial/addLesson', (req, res) => {
     });
 });
 
+router.get('/tutorial/getAllTutorials', (req, res) => {
+    let query = {};
+    tutorialLibs.getTutorial(query).then((tutorials) => {
+        res.status(tutorials.status).send(tutorials);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.post('/tutorial/addUser', (req, res) => {
+    let data = {
+        usersId : req.header('uuid'),
+        tid : req.body.tid
+    }
+    tutorialLibs.addUser(data).then((tutorials) => {
+        res.status(tutorials.status).send(tutorials);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.get('/tutorial/getNumberOfUsers', (req, res) => {
+    let data = {
+        tid : req.body.tid
+    };
+    tutorialLibs.numberOfUsers(data).then((tutorials) => {
+        res.status(tutorials.status).send(tutorials);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 module.exports = router;

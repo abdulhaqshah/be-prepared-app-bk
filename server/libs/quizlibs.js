@@ -1,6 +1,6 @@
 const Quiz = require('../DataBase/models/quiz');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
-const {checkQuestionType} = require('../utilities/utilityFunctions')
+const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions')
 
 const createQuiz = function (data) {
     return new Promise((resolve,reject) => {
@@ -30,7 +30,7 @@ const createQuiz = function (data) {
 
 const getQuiz = function (query) {
     return new Promise((resolve,reject) => {
-        Quiz.findOne(query).then((quiz) => {
+        Quiz.find(query).then((quiz) => {
             if (quiz) {
                 resolve({
                     status : statusCodes.successful,
@@ -99,6 +99,68 @@ const getQuestionsByType = function (data) {
                 error
             });
         });
+    });
+};
+
+const addUser = function (data) {
+    return new Promise((resolve, reject) => {
+        getQuiz({qid : data.qid}).then((quiz) => {
+            if (quiz) {
+                let found = checkUserId(quiz.data, data.usersId);
+                if (found) {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error : `User ${messages.duplicate}`
+                    });
+                } else {
+                    Quiz.findOneAndUpdate({qid : data.qid}, {$push : {usersIDs : data.usersId}}, {new : true})
+                    .then((quiz) => {
+                        if (quiz) {
+                            resolve({
+                                status : statusCodes.successful,
+                                message : `User ${messages.added}`,
+                                data : quiz
+                            });
+                        } else {
+                            reject({
+                                status : statusCodes.notFound,
+                                message: `Quiz ${messages.notFound}`
+                            });
+                        }
+                    }).catch((error) => {
+                        reject({
+                            status : statusCodes.badRequest,
+                            error
+                        });
+                    });
+                }
+            }
+        })
+    });
+};
+
+const numberOfUsers = function (data) {
+    return new Promise ((resolve,reject) => {
+        getQuiz(data).then((quiz) => {
+            if (quiz) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.added}`,
+                    numberOfUsers : quiz.data[0].usersIDs.length
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
     })
 }
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType}
+
+module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, addUser, numberOfUsers}

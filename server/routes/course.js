@@ -39,4 +39,36 @@ router.get('/course/getQuestionByType', (req, res) => {
     });
 });
 
+router.get('/course/getAllCourses', (req, res) => {
+    let query = {};
+    courseLibs.getCourse(query).then((courses) => {
+        res.status(courses.status).send(courses);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.post('/course/addUser', (req, res) => {
+    let data = {
+        usersId : req.header('uuid'),
+        cid : req.body.cid
+    }
+    courseLibs.addUser(data).then((course) => {
+        res.status(course.status).send(course);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.get('/course/getNumberOfUsers', (req, res) => {
+    let data = {
+        cid : req.body.cid
+    };
+    courseLibs.numberOfUsers(data).then((course) => {
+        res.status(course.status).send(course);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 module.exports = router;

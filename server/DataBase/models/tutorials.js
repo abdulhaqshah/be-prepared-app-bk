@@ -22,10 +22,7 @@ let TutorialSchema = new mongoose.Schema({
                 type : String,
                 required : true
             },
-            explanation : {
-                type : String
-            },
-            example : {
+            content : {
                 type : String
             }
         }]

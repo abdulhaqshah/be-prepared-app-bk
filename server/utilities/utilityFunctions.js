@@ -50,5 +50,17 @@ const checkQuestionType = (arr,type) => {
     return question;
 }
 
+const checkUserId = (arr,userId) => {
+    let check = false;
+    for(let i = 0; i < arr.length; i++) {
+        for(let j = 0; j < arr[i].usersIDs.length; j++) {
+            if(arr[i].usersIDs[j] === userId) {
+                check = true;
+            }
+        }
+    }
+    return check;
+}
 
-module.exports = {validateFields, isEmpty, decodeToken, checkQuestionType};
+
+module.exports = {validateFields, isEmpty, decodeToken, checkQuestionType, checkUserId};

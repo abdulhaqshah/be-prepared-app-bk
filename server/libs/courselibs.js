@@ -1,6 +1,6 @@
 const Course = require('../DataBase/models/courses');
 const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
-const {checkQuestionType} = require('../utilities/utilityFunctions')
+const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions')
 
 const createCourse = function (data) {
     return new Promise((resolve,reject) => {
@@ -30,7 +30,7 @@ const createCourse = function (data) {
 
 const getCourse = function (query) {
     return new Promise((resolve,reject) => {
-        Course.findOne(query).then((course) => {
+        Course.find(query).then((course) => {
             if (course) {
                 resolve({
                     status : statusCodes.successful,
@@ -101,4 +101,66 @@ const getQuestionsByType = function (data) {
         });
     })
 }
-module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType}
+
+const addUser = function (data) {
+    return new Promise((resolve, reject) => {
+        getCourse({cid : data.cid}).then((course) => {
+            if (course) {
+                let found = checkUserId(course.data, data.usersId);
+                if (found) {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error : `User ${messages.duplicate}`
+                    });
+                } else {
+                    Course.findOneAndUpdate({cid : data.cid}, {$push : {usersIDs : data.usersId}}, {new : true})
+                    .then((course) => {
+                        if (course) {
+                            resolve({
+                                status : statusCodes.successful,
+                                message : `User ${messages.added}`,
+                                data : course
+                            });
+                        } else {
+                            reject({
+                                status : statusCodes.notFound,
+                                message: `Course ${messages.notFound}`
+                            });
+                        }
+                    }).catch((error) => {
+                        reject({
+                            status : statusCodes.badRequest,
+                            error
+                        });
+                    });
+                }
+            }
+        })
+    });
+};
+
+const numberOfUsers = function (data) {
+    return new Promise ((resolve,reject) => {
+        getCourse(data).then((course) => {
+            if (course) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.added}`,
+                    numberOfUsers : course.data[0].usersIDs.length
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Course ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, addUser, numberOfUsers}

@@ -26,7 +26,7 @@ let QuizSchema = new mongoose.Schema({
             required : true
         }
     }],
-    likes : Number
+    usersIDs : [String]
 });
 
 QuizSchema.pre('save' , function(next) {
