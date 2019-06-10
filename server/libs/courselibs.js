@@ -163,4 +163,27 @@ const numberOfUsers = function (data) {
     })
 }
 
-module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, addUser, numberOfUsers}
+const deleteCourse = function(data) {
+    return new Promise ((resolve, reject) => {
+        Course.findOneAndDelete(data).then((course) => {
+            if (course) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Course ${messages.deleted}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Course ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, addUser, numberOfUsers, deleteCourse}

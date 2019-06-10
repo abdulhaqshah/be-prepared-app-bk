@@ -11,9 +11,9 @@ router.post('/quiz/createQuiz', (req, res) => {
     });
 });
 
-router.get('/quiz/getQuizById', (req, res) => {
+router.get('/quiz/getQuizById/:qid', (req, res) => {
     let query = {
-        qid : req.body.qid
+        qid : req.params.qid
     }
     quizLibs.getQuiz(query).then((quiz) => {
         res.status(quiz.status).send(quiz);
@@ -65,6 +65,17 @@ router.get('/quiz/getNumberOfUsers', (req, res) => {
         qid : req.body.qid
     };
     quizLibs.numberOfUsers(data).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.delete('/quiz/:qid', (req,res) => {
+    let data = {
+        qid : req.params.qid
+    };
+    quizLibs.deleteQuiz(data).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
         res.status(error.status).send(error);
