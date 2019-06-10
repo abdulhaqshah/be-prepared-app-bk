@@ -163,4 +163,27 @@ const numberOfUsers = function (data) {
     })
 }
 
-module.exports = {createTutorial, getTutorial, addTopic, addLesson, addUser, numberOfUsers}
+const deleteTutorial = function(data) {
+    return new Promise ((resolve, reject) => {
+        Tutorial.findOneAndDelete(data).then((tutorial) => {
+            if (tutorial) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Tutorial ${messages.deleted}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Tutorial ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createTutorial, getTutorial, addTopic, addLesson, addUser, numberOfUsers, deleteTutorial}

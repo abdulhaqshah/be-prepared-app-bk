@@ -11,9 +11,9 @@ router.post('/course/createCourse', (req, res) => {
     });
 });
 
-router.get('/course/getCourseById', (req, res) => {
+router.get('/course/getCourseById/:cid', (req, res) => {
     let query = {
-        cid : req.body.cid
+        cid : req.params.cid
     }
     courseLibs.getCourse(query).then((course) => {
         res.status(course.status).send(course);
@@ -65,6 +65,17 @@ router.get('/course/getNumberOfUsers', (req, res) => {
         cid : req.body.cid
     };
     courseLibs.numberOfUsers(data).then((course) => {
+        res.status(course.status).send(course);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.delete('/course/:cid', (req,res) => {
+    let data = {
+        cid : req.params.cid
+    };
+    courseLibs.deleteCourse(data).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);

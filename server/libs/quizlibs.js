@@ -163,4 +163,27 @@ const numberOfUsers = function (data) {
     })
 }
 
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, addUser, numberOfUsers}
+const deleteQuiz = function(data) {
+    return new Promise ((resolve, reject) => {
+        Quiz.findOneAndDelete(data).then((quiz) => {
+            if (quiz) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Quiz ${messages.deleted}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, addUser, numberOfUsers, deleteQuiz}
