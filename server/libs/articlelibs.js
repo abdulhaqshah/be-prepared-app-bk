@@ -6,8 +6,8 @@ const createArticle = function (data) {
     return new Promise((resolve,reject) => {
         Article.create({
             publishedBy : data.uuid,
-            topic : data.body.topic,
-            article : data.body.article
+            topic : data.topic,
+            article : data.article
         }).then((article) => {
             if (article) {
                 resolve({
@@ -32,11 +32,11 @@ const createArticle = function (data) {
 
 const getArticle = function (query) {
     return new Promise((resolve,reject) => {
-        Article.findOne(query).then((article) => {
+        Article.find(query).then((article) => {
             if (article) {
                 resolve({
                     status : statusCodes.successful,
-                    message : `Article ${messages.found}`, 
+                    message : `Article/s ${messages.found}`, 
                     data : article
                 })
             } else {
@@ -57,12 +57,12 @@ const getArticle = function (query) {
 const addComment = function (data) {
     return new Promise((resolve,reject) => {
         let comment = {
-            comment : data.body.comment,
+            comment : data.comment,
             commentedBy : data.uuid
         }
-        Article.findOneAndUpdate({articleId : data.body.articleId}, {$push : {comments : comment}}, {new : true}).then((article) => {
+        Article.findOneAndUpdate({articleId : data.articleId}, {$push : {comments : comment}}, {new : true}).then((article) => {
             if (article) {
-                let coment = article.comments.find((comments) => comments.comment === data.body.comment);
+                let coment = article.comments.find((comments) => comments.comment === data.comment);
                 resolve({
                     status : statusCodes.successful,
                     message : `Comment ${messages.added}`,
