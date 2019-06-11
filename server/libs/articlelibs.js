@@ -66,7 +66,7 @@ const addComment = function (data) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Comment ${messages.added}`,
-                    data : coment._id
+                    data : coment
                 })
             } else {
                 reject({

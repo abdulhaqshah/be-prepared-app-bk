@@ -70,7 +70,7 @@
             }
         ],
         "eol-last": "off",
-        "eqeqeq": "off",
+        "eqeqeq": "error",
         "func-call-spacing": "off",
         "func-name-matching": "error",
         "func-names": "off",

@@ -17,10 +17,7 @@ router.post('/article/', (req, res) => {
 });
 
 router.get('/article/:articleId', (req, res) => {
-    let query = {
-        articleId : req.params.articleId
-    }
-    articleLibs.getArticle(query).then((article) => {
+    articleLibs.getArticle({articleId : req.params.articleId}).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -28,10 +25,7 @@ router.get('/article/:articleId', (req, res) => {
 });
 
 router.get('/article/:topic', (req, res) => {
-    let query = {
-        topic : req.params.topic
-    }
-    articleLibs.getArticle(query).then((article) => {
+    articleLibs.getArticle({topic : req.params.topic}).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -52,15 +46,14 @@ router.patch('/article/addComment', (req, res) => {
 })
 
 router.patch('/article/editComment', (req, res) => {
-    let data = req.body;
-    articleLibs.editComment(data).then((article) => {
+    articleLibs.editComment(req.body).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 })
 
-router.get('/article/getCommentById/:aid/:cid', (req, res) => {
+router.get('/article/:aid/comment/:cid', (req, res) => {
     let data = {
         articleId : req.params.aid,
         commentId : req.params.cid
@@ -72,7 +65,7 @@ router.get('/article/getCommentById/:aid/:cid', (req, res) => {
     });
 })
 
-router.delete('/article/deleteComment/:aid/:cid', (req, res) => {
+router.delete('/article/:aid/comment/:cid/delete', (req, res) => {
     let data = {
         articleId : req.params.aid,
         commentId : req.params.cid
@@ -84,9 +77,8 @@ router.delete('/article/deleteComment/:aid/:cid', (req, res) => {
     });
 })
 
-router.get('/article/getAllArticles', (req, res) => {
-    let query = {};
-    articleLibs.getArticle(query).then((article) => {
+router.get('/article/all', (req, res) => {
+    articleLibs.getArticle({}).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);

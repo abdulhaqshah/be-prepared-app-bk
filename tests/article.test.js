@@ -10,10 +10,8 @@ const {articles, populateArticles} = require('./articleseed');
 const {secretKeys} = require ('./../server/utilities/constants');
 const {users, populateUsers} = require('./seed');
 
-let articleOne;
-let articleTwo;
-let userOne;
-let userTwo;
+let articleOne, articleTwo;
+let userOne, userTwo;
 beforeEach(() => {
     return populateArticles().then((articles) => {
         articleOne = articles[0];
