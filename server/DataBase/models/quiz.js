@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const uuidv4 = require('uuid/v4');
 
 let QuizSchema = new mongoose.Schema({
-    qid : {
+    quizId : {
         type : String,
         unique : true
     },
@@ -26,12 +26,12 @@ let QuizSchema = new mongoose.Schema({
             required : true
         }
     }],
-    usersIDs : [String]
+    active : {type : Boolean, default : false}
 });
 
 QuizSchema.pre('save' , function(next) {
     let quiz = this;
-    quiz.qid = uuidv4();
+    quiz.quizId = uuidv4();
     next();
 });
 

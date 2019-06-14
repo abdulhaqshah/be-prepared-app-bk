@@ -54,7 +54,7 @@ const getCourse = function (query) {
 
 const addQuestion = function (data) {
     return new Promise((resolve,reject) => {
-        Course.findOneAndUpdate({cid : data.cid}, {$push : {questions : data.question}}, {new : true})
+        Course.findOneAndUpdate({courseId : data.courseId}, {$push : {questions : data.question}}, {new : true})
         .then((course) => {
             if (course) {
                 resolve({
@@ -102,67 +102,6 @@ const getQuestionsByType = function (data) {
     })
 }
 
-const addUser = function (data) {
-    return new Promise((resolve, reject) => {
-        getCourse({cid : data.cid}).then((course) => {
-            if (course) {
-                let found = checkUserId(course.data, data.usersId);
-                if (found) {
-                    reject({
-                        status : statusCodes.badRequest,
-                        error : `User ${messages.duplicate}`
-                    });
-                } else {
-                    Course.findOneAndUpdate({cid : data.cid}, {$push : {usersIDs : data.usersId}}, {new : true})
-                    .then((course) => {
-                        if (course) {
-                            resolve({
-                                status : statusCodes.successful,
-                                message : `User ${messages.added}`,
-                                data : course
-                            });
-                        } else {
-                            reject({
-                                status : statusCodes.notFound,
-                                message: `Course ${messages.notFound}`
-                            });
-                        }
-                    }).catch((error) => {
-                        reject({
-                            status : statusCodes.badRequest,
-                            error
-                        });
-                    });
-                }
-            }
-        })
-    });
-};
-
-const numberOfUsers = function (data) {
-    return new Promise ((resolve,reject) => {
-        getCourse(data).then((course) => {
-            if (course) {
-                resolve({
-                    status : statusCodes.successful,
-                    message : `User ${messages.added}`,
-                    numberOfUsers : course.data[0].usersIDs.length
-                });
-            } else {
-                reject({
-                    status : statusCodes.notFound,
-                    message: `Course ${messages.notFound}`
-                });
-            }
-        }).catch((error) => {
-            reject({
-                status : statusCodes.badRequest,
-                error
-            });
-        });
-    })
-}
-
 const deleteCourse = function(data) {
     return new Promise ((resolve, reject) => {
         Course.findOneAndDelete(data).then((course) => {
@@ -186,4 +125,4 @@ const deleteCourse = function(data) {
     })
 }
 
-module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, addUser, numberOfUsers, deleteCourse}
+module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, deleteCourse}

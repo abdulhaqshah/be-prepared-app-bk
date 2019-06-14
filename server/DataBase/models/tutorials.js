@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const uuidv4 = require('uuid/v4');
 
 let TutorialSchema = new mongoose.Schema({
-    tid : {
+    tutorialId : {
         type : String,
         unique : true
     },
@@ -13,12 +13,12 @@ let TutorialSchema = new mongoose.Schema({
         unique : true
     },
     topics :[{
-        description : {
+        heading : {
             type : String,
             required : true
         },
         lessons : [{
-            description : {
+            heading : {
                 type : String,
                 required : true
             },
@@ -27,12 +27,12 @@ let TutorialSchema = new mongoose.Schema({
             }
         }]
     }],
-    usersIDs : [String]
+    active : {type : Boolean, default : false}
 });
 
 TutorialSchema.pre('save' , function(next) {
     let tutorial = this;
-    tutorial.tid = uuidv4();
+    tutorial.tutorialId = uuidv4();
     next();
 });
 

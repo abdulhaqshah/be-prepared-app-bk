@@ -3,7 +3,7 @@ const router = express.Router();
 const tutorialLibs = require('../libs/tutoriallibs');
 const {authenticate} = require('./../middleware/authenticate');
 
-router.post('/tutorial/createTutorial', (req, res) => {
+router.post('/tutorial/new', (req, res) => {
     tutorialLibs.createTutorial(req.body).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
@@ -11,11 +11,8 @@ router.post('/tutorial/createTutorial', (req, res) => {
     });
 });
 
-router.get('/tutorial/getTutorialById/:tid', (req, res) => {
-    let query = {
-        tid : req.params.tid
-    }
-    tutorialLibs.getTutorial(query).then((tutorial) => {
+router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
+    tutorialLibs.getTutorial({tutorialId : req.params.tutorialId, active : true}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -38,43 +35,24 @@ router.post('/tutorial/addLesson', (req, res) => {
     });
 });
 
-router.get('/tutorial/getAllTutorials', (req, res) => {
-    let query = {};
-    tutorialLibs.getTutorial(query).then((tutorials) => {
+router.get('/tutorial/allActive', (req, res) => {
+    tutorialLibs.getTutorial({active : true}).then((tutorials) => {
         res.status(tutorials.status).send(tutorials);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 })
 
-router.post('/tutorial/addUser', (req, res) => {
-    let data = {
-        usersId : req.header('uuid'),
-        tid : req.body.tid
-    }
-    tutorialLibs.addUser(data).then((tutorials) => {
+router.get('/tutorial/allInActive', (req, res) => {
+    tutorialLibs.getTutorial({active : false}).then((tutorials) => {
         res.status(tutorials.status).send(tutorials);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 })
 
-router.get('/tutorial/getNumberOfUsers', (req, res) => {
-    let data = {
-        tid : req.body.tid
-    };
-    tutorialLibs.numberOfUsers(data).then((tutorials) => {
-        res.status(tutorials.status).send(tutorials);
-    }).catch((error) => {
-        res.status(error.status).send(error);
-    });
-})
-
-router.delete('/tutorial/:tid', (req,res) => {
-    let data = {
-        tid : req.params.tid
-    };
-    tutorialLibs.deleteTutorial(data).then((tutorial) => {
+router.delete('/tutorial/:tutorialId', (req,res) => {
+    tutorialLibs.deleteTutorial({tutorialId : req.params.tutorialId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);

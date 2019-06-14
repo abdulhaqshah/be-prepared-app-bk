@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const uuidv4 = require('uuid/v4');
 
 let CourseSchema = new mongoose.Schema({
-    cid : {
+    courseId : {
         type : String,
         unique : true
     },
@@ -29,12 +29,12 @@ let CourseSchema = new mongoose.Schema({
             required : true
         }
     }],
-    usersIDs : [String]
+    active : {type : Boolean, default : false}
 });
 
 CourseSchema.pre('save' , function(next) {
     let course = this;
-    course.cid = uuidv4();
+    course.courseId = uuidv4();
     next();
 });
 

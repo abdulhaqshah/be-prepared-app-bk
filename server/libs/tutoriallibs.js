@@ -54,7 +54,7 @@ const getTutorial = function (query) {
 
 const addTopic = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOneAndUpdate({tid : data.tid}, {$push : {topics : data.topic}}, {new : true})
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId, active : true}, {$push : {topics : data.topic}}, {new : true})
         .then((tutorial) => {
             if (tutorial) {
                 resolve({
@@ -79,7 +79,7 @@ const addTopic = function (data) {
 
 const addLesson = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOneAndUpdate({tid : data.tid, "topics._id" : data.topicId}, {$push : {"topics.$.lessons" : data.lesson}}, {new : true})
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId, active : true, "topics._id" : data.topicId}, {$push : {"topics.$.lessons" : data.lesson}}, {new : true})
         .then((tutorial) => {
             if (tutorial) {
                 resolve({
@@ -101,67 +101,6 @@ const addLesson = function (data) {
         });
     });
 };
-
-const addUser = function (data) {
-    return new Promise((resolve, reject) => {
-        getTutorial({tid : data.tid}).then((tutorial) => {
-            if (tutorial) {
-                let found = checkUserId(tutorial.data, data.usersId);
-                if (found) {
-                    reject({
-                        status : statusCodes.badRequest,
-                        error : `User ${messages.duplicate}`
-                    });
-                } else {
-                    Tutorial.findOneAndUpdate({tid : data.tid}, {$push : {usersIDs : data.usersId}}, {new : true})
-                    .then((tutorial) => {
-                        if (tutorial) {
-                            resolve({
-                                status : statusCodes.successful,
-                                message : `User ${messages.added}`,
-                                data : tutorial
-                            });
-                        } else {
-                            reject({
-                                status : statusCodes.notFound,
-                                message: `Tutorial ${messages.notFound}`
-                            });
-                        }
-                    }).catch((error) => {
-                        reject({
-                            status : statusCodes.badRequest,
-                            error
-                        });
-                    });
-                }
-            }
-        })
-    });
-};
-
-const numberOfUsers = function (data) {
-    return new Promise ((resolve,reject) => {
-        getTutorial(data).then((tutorial) => {
-            if (tutorial) {
-                resolve({
-                    status : statusCodes.successful,
-                    message : `User ${messages.added}`,
-                    numberOfUsers : tutorial.data[0].usersIDs.length
-                });
-            } else {
-                reject({
-                    status : statusCodes.notFound,
-                    message: `Tutorial ${messages.notFound}`
-                });
-            }
-        }).catch((error) => {
-            reject({
-                status : statusCodes.badRequest,
-                error
-            });
-        });
-    })
-}
 
 const deleteTutorial = function(data) {
     return new Promise ((resolve, reject) => {
@@ -186,4 +125,4 @@ const deleteTutorial = function(data) {
     })
 }
 
-module.exports = {createTutorial, getTutorial, addTopic, addLesson, addUser, numberOfUsers, deleteTutorial}
+module.exports = {createTutorial, getTutorial, addTopic, addLesson, deleteTutorial}

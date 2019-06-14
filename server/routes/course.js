@@ -3,7 +3,7 @@ const router = express.Router();
 const courseLibs = require('../libs/courselibs');
 const {authenticate} = require('./../middleware/authenticate');
 
-router.post('/course/createCourse', (req, res) => {
+router.post('/course/new', (req, res) => {
     courseLibs.createCourse(req.body).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
@@ -11,11 +11,8 @@ router.post('/course/createCourse', (req, res) => {
     });
 });
 
-router.get('/course/getCourseById/:cid', (req, res) => {
-    let query = {
-        cid : req.params.cid
-    }
-    courseLibs.getCourse(query).then((course) => {
+router.get('/course/courseById/:courseId', (req, res) => {
+    courseLibs.getCourse({courseId : req.params.courseId, active : true}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -30,52 +27,32 @@ router.post('/course/addQuestion', (req, res) => {
     });
 });
 
-router.get('/course/getQuestionByType', (req, res) => {
-    let data = req.body;
-    courseLibs.getQuestionsByType(data).then((course) => {
+router.get('/course/questionByType/:problemType', (req, res) => {
+    courseLibs.getQuestionsByType({problemType : req.params.problemType}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 });
 
-router.get('/course/getAllCourses', (req, res) => {
-    let query = {};
-    courseLibs.getCourse(query).then((courses) => {
+router.get('/course/allActive', (req, res) => {
+    courseLibs.getCourse({active : true}).then((courses) => {
         res.status(courses.status).send(courses);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 })
 
-router.post('/course/addUser', (req, res) => {
-    let data = {
-        usersId : req.header('uuid'),
-        cid : req.body.cid
-    }
-    courseLibs.addUser(data).then((course) => {
-        res.status(course.status).send(course);
+router.get('/course/allInActive', (req, res) => {
+    courseLibs.getCourse({active : false}).then((courses) => {
+        res.status(courses.status).send(courses);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 })
 
-router.get('/course/getNumberOfUsers', (req, res) => {
-    let data = {
-        cid : req.body.cid
-    };
-    courseLibs.numberOfUsers(data).then((course) => {
-        res.status(course.status).send(course);
-    }).catch((error) => {
-        res.status(error.status).send(error);
-    });
-})
-
-router.delete('/course/:cid', (req,res) => {
-    let data = {
-        cid : req.params.cid
-    };
-    courseLibs.deleteCourse(data).then((course) => {
+router.delete('/course/:courseId', (req,res) => {
+    courseLibs.deleteCourse({courseId : req.params.courseId}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);

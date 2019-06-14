@@ -54,7 +54,7 @@ const getQuiz = function (query) {
 
 const addQuestion = function (data) {
     return new Promise((resolve,reject) => {
-        Quiz.findOneAndUpdate({qid : data.qid}, {$push : {questions : data.question}}, {new : true})
+        Quiz.findOneAndUpdate({quizId : data.quizId}, {$push : {questions : data.question}}, {new : true})
         .then((quiz) => {
             if (quiz) {
                 resolve({
@@ -102,67 +102,6 @@ const getQuestionsByType = function (data) {
     });
 };
 
-const addUser = function (data) {
-    return new Promise((resolve, reject) => {
-        getQuiz({qid : data.qid}).then((quiz) => {
-            if (quiz) {
-                let found = checkUserId(quiz.data, data.usersId);
-                if (found) {
-                    reject({
-                        status : statusCodes.badRequest,
-                        error : `User ${messages.duplicate}`
-                    });
-                } else {
-                    Quiz.findOneAndUpdate({qid : data.qid}, {$push : {usersIDs : data.usersId}}, {new : true})
-                    .then((quiz) => {
-                        if (quiz) {
-                            resolve({
-                                status : statusCodes.successful,
-                                message : `User ${messages.added}`,
-                                data : quiz
-                            });
-                        } else {
-                            reject({
-                                status : statusCodes.notFound,
-                                message: `Quiz ${messages.notFound}`
-                            });
-                        }
-                    }).catch((error) => {
-                        reject({
-                            status : statusCodes.badRequest,
-                            error
-                        });
-                    });
-                }
-            }
-        })
-    });
-};
-
-const numberOfUsers = function (data) {
-    return new Promise ((resolve,reject) => {
-        getQuiz(data).then((quiz) => {
-            if (quiz) {
-                resolve({
-                    status : statusCodes.successful,
-                    message : `User ${messages.added}`,
-                    numberOfUsers : quiz.data[0].usersIDs.length
-                });
-            } else {
-                reject({
-                    status : statusCodes.notFound,
-                    message: `Quiz ${messages.notFound}`
-                });
-            }
-        }).catch((error) => {
-            reject({
-                status : statusCodes.badRequest,
-                error
-            });
-        });
-    })
-}
-
 const deleteQuiz = function(data) {
     return new Promise ((resolve, reject) => {
         Quiz.findOneAndDelete(data).then((quiz) => {
@@ -186,4 +125,4 @@ const deleteQuiz = function(data) {
     })
 }
 
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, addUser, numberOfUsers, deleteQuiz}
+module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz}
