@@ -19,7 +19,7 @@ router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
     });
 });
 
-router.post('/tutorial/addTopic', (req, res) => {
+router.post('/tutorial/new/topic', (req, res) => {
     tutorialLibs.addTopic(req.body).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
@@ -27,7 +27,7 @@ router.post('/tutorial/addTopic', (req, res) => {
     });
 });
 
-router.post('/tutorial/addLesson', (req, res) => {
+router.post('/tutorial/new/lesson', (req, res) => {
     tutorialLibs.addLesson(req.body).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
