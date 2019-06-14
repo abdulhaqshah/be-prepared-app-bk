@@ -26,7 +26,8 @@ const messages = {
     notAdmin     : "is not an admin",
     deActivated  : "has been de-activated",
     found        : "has been found",
-    added        : "has been added"
+    added        : "has been added",
+    activation   : "activation has been changed"
 }
 
 const secretKeys = {

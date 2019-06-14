@@ -16,7 +16,7 @@ router.post('/article/', (req, res) => {
     });
 });
 
-router.get('/article/:articleId', (req, res) => {
+router.get('/article/:articleId/getArticleById', (req, res) => {
     articleLibs.getArticle({articleId : req.params.articleId}).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
@@ -24,7 +24,7 @@ router.get('/article/:articleId', (req, res) => {
     });
 });
 
-router.get('/article/:topic', (req, res) => {
+router.get('/article/:topic/getArticleByTopic', (req, res) => {
     articleLibs.getArticle({topic : req.params.topic}).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {

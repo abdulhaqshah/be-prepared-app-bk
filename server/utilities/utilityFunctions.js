@@ -35,5 +35,32 @@ const decodeToken = (token) => {
     return decoded;
 }
 
+const checkQuestionType = (arr,type) => {
+    let question = [];
+    for(let i = 0; i < arr.length; i++) {
+        for(let j = 0; j < arr[i].questions.length; j++) {
+            if(arr[i].questions[j].problemSolving === type){
+                question.push({
+                    courseName : arr[i].name,
+                    question : arr[i].questions[j]
+                });
+            }
+        }
+    }
+    return question;
+}
 
-module.exports = {validateFields, isEmpty, decodeToken};
+const checkUserId = (arr,userId) => {
+    let check = false;
+    for(let i = 0; i < arr.length; i++) {
+        for(let j = 0; j < arr[i].usersIDs.length; j++) {
+            if(arr[i].usersIDs[j] === userId) {
+                check = true;
+            }
+        }
+    }
+    return check;
+}
+
+
+module.exports = {validateFields, isEmpty, decodeToken, checkQuestionType, checkUserId};
