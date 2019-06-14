@@ -125,4 +125,28 @@ const deleteTutorial = function(data) {
     })
 }
 
-module.exports = {createTutorial, getTutorial, addTopic, addLesson, deleteTutorial}
+const changeActivation = function (data) {
+    return new Promise((resolve,reject) => {
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId}, {$set : {active : data.activeType}}, {new :true})
+        .then((tutorial) => {
+            if (tutorial) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Tutorial ${messages.activation}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Tutorial ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createTutorial, getTutorial, addTopic, addLesson, deleteTutorial, changeActivation}

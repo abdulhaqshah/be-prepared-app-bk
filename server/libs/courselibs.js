@@ -125,4 +125,28 @@ const deleteCourse = function(data) {
     })
 }
 
-module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, deleteCourse}
+const changeActivation = function (data) {
+    return new Promise((resolve,reject) => {
+        Course.findOneAndUpdate({courseId : data.courseId}, {$set : {active : data.activeType}}, {new :true})
+        .then((course) => {
+            if (course) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Course ${messages.activation}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Course ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, deleteCourse, changeActivation}

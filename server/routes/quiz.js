@@ -59,4 +59,20 @@ router.delete('/quiz/:quizId', (req,res) => {
     });
 })
 
+router.patch('/quiz/activate/:quizId', (req,res) => {
+    quizLibs.changeActivation({quizId : req.params.quizId, activeType : true}).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.patch('/quiz/deActivate/:quizId', (req,res) => {
+    quizLibs.changeActivation({quizId : req.params.quizId, activeType : false}).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 module.exports = router;

@@ -125,4 +125,28 @@ const deleteQuiz = function(data) {
     })
 }
 
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz}
+const changeActivation = function (data) {
+    return new Promise((resolve,reject) => {
+        Quiz.findOneAndUpdate({quizId : data.quizId}, {$set : {active : data.activeType}}, {new :true})
+        .then((quiz) => {
+            if (quiz) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Quiz ${messages.activation}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz, changeActivation}

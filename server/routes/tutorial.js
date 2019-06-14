@@ -51,6 +51,22 @@ router.get('/tutorial/allInActive', (req, res) => {
     });
 })
 
+router.patch('/tutorial/activate/:tutorialId', (req,res) => {
+    tutorialLibs.changeActivation({tutorialId : req.params.tutorialId, activeType : true}).then((tutorial) => {
+        res.status(tutorial.status).send(tutorial);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.patch('/tutorial/deActivate/:tutorialId', (req,res) => {
+    tutorialLibs.changeActivation({tutorialId : req.params.tutorialId, activeType : false}).then((tutorial) => {
+        res.status(tutorial.status).send(tutorial);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 router.delete('/tutorial/:tutorialId', (req,res) => {
     tutorialLibs.deleteTutorial({tutorialId : req.params.tutorialId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);

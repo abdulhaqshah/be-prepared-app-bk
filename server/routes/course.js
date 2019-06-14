@@ -59,4 +59,20 @@ router.delete('/course/:courseId', (req,res) => {
     });
 })
 
+router.patch('/course/activate/:courseId', (req,res) => {
+    courseLibs.changeActivation({courseId : req.params.courseId, activeType : true}).then((course) => {
+        res.status(course.status).send(course);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
+router.patch('/course/deActivate/:courseId', (req,res) => {
+    courseLibs.changeActivation({courseId : req.params.courseId, activeType : false}).then((course) => {
+        res.status(course.status).send(course);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 module.exports = router;
