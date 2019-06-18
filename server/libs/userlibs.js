@@ -253,7 +253,7 @@ const changePassword = function(data) {
     })
 }
 
-const uploadPhoto = function(req, res) {
+const uploadPhoto = function(req) {
     let id = req.params.uuid;
     let form = new formidable.IncomingForm();
     form.uploadDir = "public/images";
