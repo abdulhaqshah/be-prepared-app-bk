@@ -38,4 +38,8 @@ const timeScale = {
     twoDays : 172800000
 }
 
-module.exports = {statusCodes, messages, secretKeys, timeScale}
+const imageFolder = {
+    path : "public/images"
+}
+
+module.exports = {statusCodes, messages, secretKeys, timeScale, imageFolder}

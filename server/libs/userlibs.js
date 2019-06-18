@@ -1,9 +1,10 @@
 const User = require ('../DataBase/models/user');
+const formidable = require('formidable');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {validateFields, decodeToken} = require('./../utilities/utilityFunctions');
 const {createToken} = require('./tokenlibs');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const {statusCodes, messages, secretKeys, timeScale, imageFolder} = require ('../utilities/constants');
 
 const register = function (userData) {
     return new Promise((resolve,reject) => {
@@ -252,4 +253,39 @@ const changePassword = function(data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser}
+const uploadPhoto = function(req) {
+    let id = req.params.uuid;
+    let form = new formidable.IncomingForm();
+    form.uploadDir = imageFolder.path;
+    form.keepExtensions = true;
+    form.maxFieldsSize = 10 * 1024 * 1024;
+    return new Promise((resolve,reject) => {
+        form.parse(req, (error, fields, file) => {
+            if(error){
+                reject({
+                    status : statusCodes.badRequest,
+                    error
+                })
+            }
+            User.findOneAndUpdate({uuid : id}, {$set :{"image" : file.photo.path}}, {new: true}, (error, doc) => {
+                if (doc) {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Photo ${messages.updated}`, 
+                        data : {
+                            path : file.photo.path,
+                            type : file.photo.type
+                        }
+                    });
+                } else {
+                    reject({
+                        status : statusCodes.badRequest,
+                        data : 'error'   
+                    })
+                }
+            })
+        })
+    })
+};
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto}
