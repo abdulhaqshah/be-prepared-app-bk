@@ -4,7 +4,7 @@ const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {validateFields, decodeToken} = require('./../utilities/utilityFunctions');
 const {createToken} = require('./tokenlibs');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const {statusCodes, messages, secretKeys, timeScale, imageFolder} = require ('../utilities/constants');
 
 const register = function (userData) {
     return new Promise((resolve,reject) => {
@@ -256,7 +256,7 @@ const changePassword = function(data) {
 const uploadPhoto = function(req) {
     let id = req.params.uuid;
     let form = new formidable.IncomingForm();
-    form.uploadDir = "public/images";
+    form.uploadDir = imageFolder.path;
     form.keepExtensions = true;
     form.maxFieldsSize = 10 * 1024 * 1024;
     return new Promise((resolve,reject) => {
