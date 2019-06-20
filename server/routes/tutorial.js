@@ -4,6 +4,7 @@ const tutorialLibs = require('../libs/tutoriallibs');
 const {authenticate} = require('./../middleware/authenticate');
 
 router.post('/tutorial/new', (req, res) => {
+    req.body.createdBy = req.header('uuid');
     tutorialLibs.createTutorial(req.body).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
@@ -19,23 +20,15 @@ router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
     });
 });
 
-router.post('/tutorial/new/topic', (req, res) => {
-    tutorialLibs.addTopic(req.body).then((tutorial) => {
+router.get('/tutorial/tutorialByCourse/:courseId', (req, res) => {
+    tutorialLibs.getTutorial({courseId : req.params.courseId, active : true}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 });
 
-router.post('/tutorial/new/lesson', (req, res) => {
-    tutorialLibs.addLesson(req.body).then((tutorial) => {
-        res.status(tutorial.status).send(tutorial);
-    }).catch((error) => {
-        res.status(error.status).send(error);
-    });
-});
-
-router.get('/tutorial/allActive', (req, res) => {
+router.get('/tutorial/all', (req, res) => {
     tutorialLibs.getTutorial({active : true}).then((tutorials) => {
         res.status(tutorials.status).send(tutorials);
     }).catch((error) => {
@@ -51,8 +44,19 @@ router.get('/tutorial/allInActive', (req, res) => {
     });
 })
 
+router.patch('/tutorial/update/:tutorialId', (req,res) => {
+    let userId = req.header('uuid');
+    tutorialLibs.updateTutorial({tutorialId : req.params.tutorialId, active : true}, req.body, userId)
+    .then((tutorial) => {
+        res.status(tutorial.status).send(tutorial);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+})
+
 router.patch('/tutorial/activate/:tutorialId', (req,res) => {
-    tutorialLibs.changeActivation({tutorialId : req.params.tutorialId, activeType : true}).then((tutorial) => {
+    tutorialLibs.changeActivation({tutorialId : req.params.tutorialId, active : true})
+    .then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -60,7 +64,8 @@ router.patch('/tutorial/activate/:tutorialId', (req,res) => {
 })
 
 router.patch('/tutorial/deActivate/:tutorialId', (req,res) => {
-    tutorialLibs.changeActivation({tutorialId : req.params.tutorialId, activeType : false}).then((tutorial) => {
+    tutorialLibs.changeActivation({tutorialId : req.params.tutorialId, active : false})
+    .then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -73,6 +78,14 @@ router.delete('/tutorial/:tutorialId', (req,res) => {
     }).catch((error) => {
         res.status(error.status).send(error);
     });
+})
+
+router.post('/tutorial/uploadPhoto/:tutorialId', (req,res) => {
+    tutorialLibs.uploadPhoto(req).then((success) => {
+        res.status(success.status).send(success);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
 })
 
 module.exports = router;

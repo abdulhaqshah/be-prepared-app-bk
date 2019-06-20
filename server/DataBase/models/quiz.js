@@ -21,9 +21,14 @@ let QuizSchema = new mongoose.Schema({
             required : true
         },
         options : [String],
-        answer : {
+        answer : [{
             type : String,
             required : true
+        }],
+        selection : {
+            type : String,
+            required : true,
+            default : "single"
         }
     }],
     active : {type : Boolean, default : false}

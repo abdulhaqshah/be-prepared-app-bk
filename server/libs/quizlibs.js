@@ -84,8 +84,33 @@ const getQuestionsByType = function (data) {
                 let questions = checkQuestionType(quiz,data.problemType);
                 resolve({
                     status : statusCodes.successful,
-                    message : `Question ${messages.added}`,
+                    message : `Question ${messages.found}`,
                     data : questions
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                })
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    });
+};
+
+const getQuestionById = function (data) {
+    return new Promise((resolve,reject) => {
+        Quiz.find(data.query).then((quiz) => {
+            if (quiz) {
+                let question = quiz.find((question) => question._id === data._id);
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Question ${messages.found}`,
+                    data : question
                 })
             } else {
                 reject({
