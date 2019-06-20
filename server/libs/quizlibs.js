@@ -4,9 +4,7 @@ const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions'
 
 const createQuiz = function (data) {
     return new Promise((resolve,reject) => {
-        Quiz.create({
-            name : data.name
-        }).then((quiz) => {
+        Quiz.create(data).then((quiz) => {
             if (quiz) {
                 resolve({
                     status : statusCodes.created,
@@ -102,11 +100,11 @@ const getQuestionsByType = function (data) {
     });
 };
 
-const getQuestionById = function (data) {
+const getQuestionById = function (query,questionId) {
     return new Promise((resolve,reject) => {
-        Quiz.find(data.query).then((quiz) => {
+        Quiz.find(query).then((quiz) => {
             if (quiz) {
-                let question = quiz.find((question) => question._id === data._id);
+                let question = quiz.find((question) => question._id === questionId);
                 resolve({
                     status : statusCodes.successful,
                     message : `Question ${messages.found}`,
@@ -174,4 +172,4 @@ const changeActivation = function (data) {
     })
 }
 
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz, changeActivation}
+module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz, changeActivation, getQuestionById}

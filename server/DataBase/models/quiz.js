@@ -31,7 +31,12 @@ let QuizSchema = new mongoose.Schema({
             default : "single"
         }
     }],
-    active : {type : Boolean, default : false}
+    createdAt : {type : Date, default : Date.now},
+    createdBy : String,
+    updatedAt : {type : Date, default : Date.now},
+    updatedBy : String,
+    active : {type : Boolean, default : false},
+    imageUrl: {type : String, default : "images/container-bg.png"}
 });
 
 QuizSchema.pre('save' , function(next) {
