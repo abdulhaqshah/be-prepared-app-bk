@@ -45,8 +45,8 @@ router.get('/tutorial/allInActive', (req, res) => {
 })
 
 router.patch('/tutorial/update/:tutorialId', (req,res) => {
-    let userId = req.header('uuid');
-    tutorialLibs.updateTutorial({tutorialId : req.params.tutorialId, active : true}, req.body, userId)
+    req.body.updatedBy = req.header('uuid');
+    tutorialLibs.updateTutorial({tutorialId : req.params.tutorialId, active : true}, req.body)
     .then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {

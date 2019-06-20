@@ -101,11 +101,9 @@ const removeTags = function (data) {
     });
 };
 
-const updateTutorial = function (query, body, userId) {
+const updateTutorial = function (query, body) {
     return new Promise((resolve,reject) => {
         body.updatedAt = Date.now();
-        body.updatedBy = userId;
-        console.log(query);//eslint-disable-line
         Tutorial.findOneAndUpdate(query, body, {new:true}).then((tutorial) => {
             if (tutorial) {
                 resolve({
@@ -153,7 +151,7 @@ const deleteTutorial = function(data) {
 
 const changeActivation = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId}, {$set : {active : data.activeType}}, {new :true})
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId}, {$set : {active : data.active}}, {new :true})
         .then((tutorial) => {
             if (tutorial) {
                 resolve({

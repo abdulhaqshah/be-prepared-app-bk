@@ -12,24 +12,13 @@ let CourseSchema = new mongoose.Schema({
         minlength : 1,
         unique : true
     },
-    questions :[{
-        description : {
-            type : String,
-            required : true
-        },
-        problemType : {
-            type : String
-        },
-        question : {
-            type : String,
-            required : true
-        },
-        answer : {
-            type : String,
-            required : true
-        }
-    }],
-    active : {type : Boolean, default : false}
+    description : String,
+    createdAt : {type : Date, default : Date.now},
+    createdBy : String,
+    updatedAt : {type : Date, default : Date.now},
+    updatedBy : String,
+    active : {type : Boolean, default : false},
+    imageUrl: {type : String, default : "images/container-bg.png"}
 });
 
 CourseSchema.pre('save' , function(next) {
