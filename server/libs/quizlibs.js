@@ -50,9 +50,34 @@ const getQuiz = function (query) {
     });
 };
 
-const addQuestion = function (data) {
+const addQuestion = function (query, data) {
     return new Promise((resolve,reject) => {
-        Quiz.findOneAndUpdate({quizId : data.quizId}, {$push : {questions : data.question}}, {new : true})
+        Quiz.findOneAndUpdate(query, {$push : {questions : data.question}}, {new : true})
+        .then((quiz) => {
+            if (quiz) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Question ${messages.added}`,
+                    data : quiz
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                })
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    });
+};
+
+const addQuestions = function (query, data) {
+    return new Promise((resolve,reject) => {
+        Quiz.findOneAndUpdate(query, {$push : {questions : {"$each" : data.questions}}}, {new : true})
         .then((quiz) => {
             if (quiz) {
                 resolve({
@@ -172,4 +197,4 @@ const changeActivation = function (data) {
     })
 }
 
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz, changeActivation, getQuestionById}
+module.exports = {createQuiz, getQuiz, addQuestion, addQuestions, getQuestionsByType, deleteQuiz, changeActivation, getQuestionById}
