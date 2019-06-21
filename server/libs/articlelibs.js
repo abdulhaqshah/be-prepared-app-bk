@@ -4,11 +4,7 @@ const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/co
 
 const createArticle = function (data) {
     return new Promise((resolve,reject) => {
-        Article.create({
-            publishedBy : data.uuid,
-            topic : data.topic,
-            article : data.article
-        }).then((article) => {
+        Article.create(data).then((article) => {
             if (article) {
                 resolve({
                     status : statusCodes.created,
@@ -33,7 +29,7 @@ const createArticle = function (data) {
 const getArticle = function (query) {
     return new Promise((resolve,reject) => {
         Article.find(query).then((article) => {
-            if (article) {
+            if (article && aricle.length > 0) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Article/s ${messages.found}`, 
@@ -156,4 +152,112 @@ const deleteComment = function (data) {
     })
 }
 
-module.exports = {createArticle, getArticle, addComment, editComment, getCommentById, deleteComment};
+const addLike = function (data) {
+    return new Promise((resolve,reject) => {
+        getArticle({articleId : data.articleId}).then((article) => {
+            let found = article.likes.find((like) => like === data.userId);
+            if (found) {
+                reject({
+                    status : statusCodes.forBidden,
+                    message : `User ${messages.liked}`
+                });
+            } else {
+                Article.findOneAndUpdate({articleId : data.articleId}, {$push : {likes : data.userId}}, {new:true})
+                .then((article) => {
+                    if (article) {
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `User ${messages.like}`
+                        })
+                    } else {
+                        reject({
+                            status : statusCodes.notFound,
+                            message : `Article ${messages.notFound}`
+                        });
+                    }
+                }).catch((error) => {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error
+                    });
+                });
+            }
+        }).catch((error) => {
+            reject(error);
+        })
+    })
+}
+
+const removeLike = function (data) {
+    return new Promise((resolve,reject) => {
+        Article.findOneAndUpdate({articleId : data.articleId}, {$pull : {likes : data.userId}}, {new : true})
+        .then((article) => {
+            if (article) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.unlike}`
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `Article ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+const approvedBy = function (query,data) {
+    return new Promise((resolve,reject) => {
+        Article.findOneAndUpdate(query, {$set : data}, {new:true})
+        .then((article) => {
+            if (article) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Article ${messages.approved}`
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `Article ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+const updateArticle = function (query, body) {
+    return new Promise((resolve,reject) => {
+        Article.findOneAndUpdate(query, body, {new:true}).then((article) => {
+            if (article) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Article ${messages.updated}`,
+                    data : article
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `Article ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createArticle, getArticle, addComment, editComment, getCommentById, deleteComment, addLike, removeLike, approvedBy, updateArticle};

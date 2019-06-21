@@ -27,7 +27,11 @@ const messages = {
     deActivated  : "has been de-activated",
     found        : "has been found",
     added        : "has been added",
-    activation   : "activation has been changed"
+    activation   : "activation has been changed",
+    liked        : "already liked",
+    like         : "liked this blog",
+    unlike       : "unliked this blog",
+    approved     : "has been approved"
 }
 
 const secretKeys = {
