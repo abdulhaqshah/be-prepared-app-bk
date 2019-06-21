@@ -7,19 +7,46 @@ let articleSchema = new mongoose.Schema({
         unique : true
     },
     publishedBy : {
-        type : String,
-        required : true
+        name : {
+            type : String,
+            required : true 
+        },
+        id : {
+            type : String,
+            required : true 
+        }
     },
-    topic : {
+    title : {
         type : String,
         required : true,
         minlength : 1
     },
-    article : {type : String},
+    content : {type : String},
     comments : [{
+        commentId : {type : String},
         comment : {type : String},
-        commentedBy : {type : String}
-    }]
+        commentedBy : {
+            name : {
+                type : String,
+                required : true 
+            },
+            id : {
+                type : String,
+                required : true 
+            }
+        }
+    }],
+    likes : [String],
+    approvedBy : {
+        name : {
+            type : String,
+            required : true 
+        },
+        id : {
+            type : String,
+            required : true 
+        }
+    }
 });
 
 articleSchema.pre('save' , function(next) {

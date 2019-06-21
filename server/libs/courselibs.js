@@ -1,12 +1,11 @@
 const Course = require('../DataBase/models/courses');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
-const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions')
+const {statusCodes, messages, imageFolder} = require ('../utilities/constants');
+const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions');
+const formidable = require('formidable');
 
 const createCourse = function (data) {
     return new Promise((resolve,reject) => {
-        Course.create({
-            name : data.name
-        }).then((course) => {
+        Course.create(data).then((course) => {
             if (course) {
                 resolve({
                     status : statusCodes.created,
@@ -52,46 +51,21 @@ const getCourse = function (query) {
     });
 };
 
-const addQuestion = function (data) {
+const updateCourse = function (query, body) {
     return new Promise((resolve,reject) => {
-        Course.findOneAndUpdate({courseId : data.courseId}, {$push : {questions : data.question}}, {new : true})
-        .then((course) => {
+        body.updatedAt = Date.now();
+        Course.findOneAndUpdate(query, body, {new:true}).then((course) => {
             if (course) {
                 resolve({
                     status : statusCodes.successful,
-                    message : `Question ${messages.added}`,
+                    message : `Course ${messages.updated}`,
                     data : course
-                })
+                });
             } else {
                 reject({
                     status : statusCodes.notFound,
                     message: `Course ${messages.notFound}`
-                })
-            }
-        }).catch((error) => {
-            reject({
-                status : statusCodes.badRequest,
-                error
-            });
-        });
-    });
-};
-
-const getQuestionsByType = function (data) {
-    return new Promise((resolve,reject) => {
-        Course.find({"questions.problemType" : data.problemType}).then((course) => {
-            if (course) {
-                let questions = checkQuestionType(course,data.problemType);
-                resolve({
-                    status : statusCodes.successful,
-                    message : `Question ${messages.added}`,
-                    data : questions
-                })
-            } else {
-                reject({
-                    status : statusCodes.notFound,
-                    message: `Course ${messages.notFound}`
-                })
+                });
             }
         }).catch((error) => {
             reject({
@@ -100,7 +74,7 @@ const getQuestionsByType = function (data) {
             });
         });
     })
-}
+};
 
 const deleteCourse = function(data) {
     return new Promise ((resolve, reject) => {
@@ -127,7 +101,7 @@ const deleteCourse = function(data) {
 
 const changeActivation = function (data) {
     return new Promise((resolve,reject) => {
-        Course.findOneAndUpdate({courseId : data.courseId}, {$set : {active : data.activeType}}, {new :true})
+        Course.findOneAndUpdate({courseId : data.courseId}, {$set : {active : data.active}}, {new :true})
         .then((course) => {
             if (course) {
                 resolve({
@@ -149,4 +123,39 @@ const changeActivation = function (data) {
     })
 }
 
-module.exports = {createCourse, getCourse, addQuestion, getQuestionsByType, deleteCourse, changeActivation}
+const uploadPhoto = function(req) {
+    let id = req.params.courseId;
+    let form = new formidable.IncomingForm();
+    form.uploadDir = imageFolder.tutorialPath;
+    form.keepExtensions = true;
+    form.maxFieldsSize = 10 * 1024 * 1024;
+    return new Promise((resolve,reject) => {
+        form.parse(req, (error, fields, file) => {
+            if(error){
+                reject({
+                    status : statusCodes.badRequest,
+                    error
+                })
+            }
+            Course.findOneAndUpdate({courseId : id}, {$set :{"imageUrl" : file.photo.path}}, {new: true}, (error, doc) => {
+                if (doc) {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Photo ${messages.updated}`, 
+                        data : {
+                            path : file.photo.path,
+                            type : file.photo.type
+                        }
+                    });
+                } else {
+                    reject({
+                        status : statusCodes.badRequest,
+                        data : 'error'   
+                    })
+                }
+            })
+        })
+    })
+};
+
+module.exports = {createCourse, getCourse, deleteCourse, changeActivation, uploadPhoto, updateCourse}

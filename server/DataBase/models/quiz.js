@@ -6,6 +6,7 @@ let QuizSchema = new mongoose.Schema({
         type : String,
         unique : true
     },
+    courseId : {type : String},
     name : {
         type : String,
         required : true,
@@ -21,12 +22,22 @@ let QuizSchema = new mongoose.Schema({
             required : true
         },
         options : [String],
-        answer : {
+        answer : [{
             type : String,
             required : true
+        }],
+        selection : {
+            type : String,
+            required : true,
+            default : "single"
         }
     }],
-    active : {type : Boolean, default : false}
+    createdAt : {type : Date, default : Date.now},
+    createdBy : {type : String},
+    updatedAt : {type : Date, default : Date.now},
+    updatedBy : {type : String},
+    active : {type : Boolean, default : false},
+    imageUrl: {type : String, default : "images/container-bg.png"}
 });
 
 QuizSchema.pre('save' , function(next) {

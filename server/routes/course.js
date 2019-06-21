@@ -19,23 +19,17 @@ router.get('/course/courseById/:courseId', (req, res) => {
     });
 });
 
-router.post('/course/addQuestion', (req, res) => {
-    courseLibs.addQuestion(req.body).then((course) => {
+router.patch('/course/update/:courseId', (req,res) => {
+    req.body.updatedBy = req.header('uuid');
+    courseLibs.updateTutorial({courseId : req.params.courseId, active : true}, req.body)
+    .then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
-});
+})
 
-router.get('/course/questionByType/:problemType', (req, res) => {
-    courseLibs.getQuestionsByType({problemType : req.params.problemType}).then((course) => {
-        res.status(course.status).send(course);
-    }).catch((error) => {
-        res.status(error.status).send(error);
-    });
-});
-
-router.get('/course/allActive', (req, res) => {
+router.get('/course/all', (req, res) => {
     courseLibs.getCourse({active : true}).then((courses) => {
         res.status(courses.status).send(courses);
     }).catch((error) => {
@@ -60,7 +54,7 @@ router.delete('/course/:courseId', (req,res) => {
 })
 
 router.patch('/course/activate/:courseId', (req,res) => {
-    courseLibs.changeActivation({courseId : req.params.courseId, activeType : true}).then((course) => {
+    courseLibs.changeActivation({courseId : req.params.courseId, active : true}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -68,11 +62,19 @@ router.patch('/course/activate/:courseId', (req,res) => {
 })
 
 router.patch('/course/deActivate/:courseId', (req,res) => {
-    courseLibs.changeActivation({courseId : req.params.courseId, activeType : false}).then((course) => {
+    courseLibs.changeActivation({courseId : req.params.courseId, active : false}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
+})
+
+router.post('/course/uploadPhoto/:courseId', (req,res) => {
+    courseLibs.uploadPhoto(req).then((success) => {
+        res.status(success.status).send(success);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
 })
 
 module.exports = router;

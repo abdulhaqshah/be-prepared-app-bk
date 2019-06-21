@@ -1,16 +1,15 @@
 const Tutorial = require('../DataBase/models/tutorials');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const {statusCodes, messages, imageFolder} = require ('../utilities/constants');
 const {checkUserId} = require('../utilities/utilityFunctions');
+const formidable = require('formidable');
 
 const createTutorial = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.create({
-            name : data.name
-        }).then((tutorial) => {
+        Tutorial.create(data).then((tutorial) => {
             if (tutorial) {
                 resolve({
                     status : statusCodes.created,
-                    message : `Course ${messages.created}`,
+                    message : `Tutorial ${messages.created}`,
                     data : tutorial
                 });
             } else {
@@ -31,7 +30,7 @@ const createTutorial = function (data) {
 const getTutorial = function (query) {
     return new Promise((resolve,reject) => {
         Tutorial.find(query).then((tutorial) => {
-            if (tutorial) {
+            if (tutorial && tutorial.length > 0) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Tutorial ${messages.found}`, 
@@ -52,14 +51,14 @@ const getTutorial = function (query) {
     });
 };
 
-const addTopic = function (data) {
+const addTags = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId, active : true}, {$push : {topics : data.topic}}, {new : true})
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId, active : true}, {$push : {tags : {"$each": data.tags}}}, {new : true})
         .then((tutorial) => {
             if (tutorial) {
                 resolve({
                     status : statusCodes.successful,
-                    message : `Topic ${messages.added}`,
+                    message : `Tags ${messages.added}`,
                     data : tutorial
                 });
             } else {
@@ -77,14 +76,14 @@ const addTopic = function (data) {
     });
 };
 
-const addLesson = function (data) {
+const removeTags = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId, active : true, "topics._id" : data.topicId}, {$push : {"topics.$.lessons" : data.lesson}}, {new : true})
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId, active : true}, {$pull : {tags : {"$each": data.tags}}}, {new : true})
         .then((tutorial) => {
             if (tutorial) {
                 resolve({
                     status : statusCodes.successful,
-                    message : `Lesson ${messages.added}`,
+                    message : `Tags ${messages.added}`,
                     data : tutorial
                 });
             } else {
@@ -100,6 +99,31 @@ const addLesson = function (data) {
             });
         });
     });
+};
+
+const updateTutorial = function (query, body) {
+    return new Promise((resolve,reject) => {
+        body.updatedAt = Date.now();
+        Tutorial.findOneAndUpdate(query, body, {new:true}).then((tutorial) => {
+            if (tutorial) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Tutorial ${messages.updated}`,
+                    data : tutorial
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Tutorial ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
 };
 
 const deleteTutorial = function(data) {
@@ -127,7 +151,7 @@ const deleteTutorial = function(data) {
 
 const changeActivation = function (data) {
     return new Promise((resolve,reject) => {
-        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId}, {$set : {active : data.activeType}}, {new :true})
+        Tutorial.findOneAndUpdate({tutorialId : data.tutorialId}, {$set : {active : data.active}}, {new :true})
         .then((tutorial) => {
             if (tutorial) {
                 resolve({
@@ -149,4 +173,39 @@ const changeActivation = function (data) {
     })
 }
 
-module.exports = {createTutorial, getTutorial, addTopic, addLesson, deleteTutorial, changeActivation}
+const uploadPhoto = function(req) {
+    let id = req.params.tutorialId;
+    let form = new formidable.IncomingForm();
+    form.uploadDir = imageFolder.tutorialPath;
+    form.keepExtensions = true;
+    form.maxFieldsSize = 10 * 1024 * 1024;
+    return new Promise((resolve,reject) => {
+        form.parse(req, (error, fields, file) => {
+            if(error){
+                reject({
+                    status : statusCodes.badRequest,
+                    error
+                })
+            }
+            Tutorial.findOneAndUpdate({tutorialId : id}, {$set :{"imageUrl" : file.photo.path}}, {new: true}, (error, doc) => {
+                if (doc) {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Photo ${messages.updated}`, 
+                        data : {
+                            path : file.photo.path,
+                            type : file.photo.type
+                        }
+                    });
+                } else {
+                    reject({
+                        status : statusCodes.badRequest,
+                        data : 'error'   
+                    })
+                }
+            })
+        })
+    })
+};
+
+module.exports = {createTutorial, getTutorial, deleteTutorial, removeTags, changeActivation, addTags, updateTutorial, uploadPhoto}

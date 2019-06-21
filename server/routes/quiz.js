@@ -4,6 +4,7 @@ const quizLibs = require('../libs/quizlibs');
 const {authenticate} = require('./../middleware/authenticate');
 
 router.post('/quiz/new', (req, res) => {
+    req.body.createdBy = req.header('uuid');
     quizLibs.createQuiz(req.body).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
@@ -19,14 +20,21 @@ router.get('/quiz/quizById/:quizId', (req, res) => {
     });
 });
 
-router.post('/quiz/addQuestion', (req, res) => {
-    quizLibs.addQuestion(req.body).then((quiz) => {
+router.post('/quiz/addQuestion/:quizId', (req, res) => {
+    quizLibs.addQuestion({quizId : req.params.quizId}, req.body).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
         res.status(error.status).send(error);
     });
 });
 
+router.post('/quiz/addQuestions/:quizId', (req, res) => {
+    quizLibs.addQuestion({quizId : req.params.quizId}, req.body).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+});
 router.get('/quiz/questionByType/:problemType', (req, res) => {
     quizLibs.getQuestionsByType({problemType : req.params.problemType}).then((quiz) => {
         res.status(quiz.status).send(quiz);
@@ -35,7 +43,15 @@ router.get('/quiz/questionByType/:problemType', (req, res) => {
     });
 });
 
-router.get('/quiz/allActive', (req, res) => {
+router.get('/quiz/quiz/:quizId/questionById/:questionId', (req, res) => {
+    quizLibs.getQuestionsByType({quizId : req.params.quizId}, req.params.questionId).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+});
+
+router.get('/quiz/all', (req, res) => {
     quizLibs.getQuiz({active : true}).then((quizzes) => {
         res.status(quizzes.status).send(quizzes);
     }).catch((error) => {

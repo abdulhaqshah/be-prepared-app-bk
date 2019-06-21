@@ -1,14 +1,11 @@
 const Article = require ('./../DataBase/models/article');
 const {ObjectID} = require('mongodb');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const uuidv4 = require('uuid/v4');
+const {statusCodes, messages} = require ('../utilities/constants');
 
 const createArticle = function (data) {
     return new Promise((resolve,reject) => {
-        Article.create({
-            publishedBy : data.uuid,
-            topic : data.topic,
-            article : data.article
-        }).then((article) => {
+        Article.create(data).then((article) => {
             if (article) {
                 resolve({
                     status : statusCodes.created,
@@ -33,7 +30,7 @@ const createArticle = function (data) {
 const getArticle = function (query) {
     return new Promise((resolve,reject) => {
         Article.find(query).then((article) => {
-            if (article) {
+            if (article && article.length > 0) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Article/s ${messages.found}`, 
@@ -57,8 +54,9 @@ const getArticle = function (query) {
 const addComment = function (data) {
     return new Promise((resolve,reject) => {
         let comment = {
+            commentId : uuidv4(),
             comment : data.comment,
-            commentedBy : data.uuid
+            commentedBy : data.commentedBy
         }
         Article.findOneAndUpdate({articleId : data.articleId}, {$push : {comments : comment}}, {new : true}).then((article) => {
             if (article) {
@@ -85,7 +83,7 @@ const addComment = function (data) {
 
 const editComment = function (data) {
     return new Promise((resolve,reject) => {
-        Article.findOneAndUpdate({"articleId": data.articleId, "comments._id" : data.commentId} , {$set : {"comments.$.comment" : data.comment}}, {new:true})
+        Article.findOneAndUpdate({"articleId": data.articleId, "comments.commentId" : data.commentId} , {$set : {"comments.$.comment" : data.comment}}, {new:true})
         .then((article) => {
             if (article) {
                 resolve({
@@ -109,9 +107,9 @@ const editComment = function (data) {
 
 const getCommentById = function (data) {
     return new Promise((resolve,reject) => {
-        Article.findOne({"articleId": data.articleId, "comments._id" : data.commentId}).then((article) => {
+        Article.findOne({"articleId": data.articleId, "comments.commentId" : data.commentId}).then((article) => {
             if (article) {
-                let comment = article.comments.find((comments) => JSON.stringify(comments._id) === JSON.stringify(data.commentId));
+                let comment = article.comments.find((comments) => JSON.stringify(comments.commentId) === JSON.stringify(data.commentId));
                 resolve({
                     status : statusCodes.successful,
                     message : `Comment ${messages.found}`,
@@ -134,7 +132,7 @@ const getCommentById = function (data) {
 
 const deleteComment = function (data) {
     return new Promise((resolve,reject) => {
-        Article.findOneAndUpdate({"articleId": data.articleId, "comments._id" : data.commentId} , {$pull : {"comments" : {_id : data.commentId}}}, {multi:true})
+        Article.findOneAndUpdate({"articleId": data.articleId, "comments.commentId" : data.commentId} , {$pull : {"comments" : {commentId : data.commentId}}}, {multi:true})
         .then((article) => {
             if (article) {
                 resolve({
@@ -156,4 +154,112 @@ const deleteComment = function (data) {
     })
 }
 
-module.exports = {createArticle, getArticle, addComment, editComment, getCommentById, deleteComment};
+const addLike = function (data) {
+    return new Promise((resolve,reject) => {
+        getArticle({articleId : data.articleId}).then((article) => {
+            let found = article.likes.find((like) => like === data.userId);
+            if (found) {
+                reject({
+                    status : statusCodes.forBidden,
+                    message : `User ${messages.liked}`
+                });
+            } else {
+                Article.findOneAndUpdate({articleId : data.articleId}, {$push : {likes : data.userId}}, {new:true})
+                .then((article) => {
+                    if (article) {
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `User ${messages.like}`
+                        })
+                    } else {
+                        reject({
+                            status : statusCodes.notFound,
+                            message : `Article ${messages.notFound}`
+                        });
+                    }
+                }).catch((error) => {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error
+                    });
+                });
+            }
+        }).catch((error) => {
+            reject(error);
+        })
+    })
+}
+
+const removeLike = function (data) {
+    return new Promise((resolve,reject) => {
+        Article.findOneAndUpdate({articleId : data.articleId}, {$pull : {likes : data.userId}}, {new : true})
+        .then((article) => {
+            if (article) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.unlike}`
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `Article ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+const approvedBy = function (query,data) {
+    return new Promise((resolve,reject) => {
+        Article.findOneAndUpdate(query, {$set : data}, {new:true})
+        .then((article) => {
+            if (article) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Article ${messages.approved}`
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `Article ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+const updateArticle = function (query, body) {
+    return new Promise((resolve,reject) => {
+        Article.findOneAndUpdate(query, body, {new:true}).then((article) => {
+            if (article) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Article ${messages.updated}`,
+                    data : article
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `Article ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    })
+}
+
+module.exports = {createArticle, getArticle, addComment, editComment, getCommentById, deleteComment, addLike, removeLike, approvedBy, updateArticle};

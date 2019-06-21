@@ -4,9 +4,7 @@ const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions'
 
 const createQuiz = function (data) {
     return new Promise((resolve,reject) => {
-        Quiz.create({
-            name : data.name
-        }).then((quiz) => {
+        Quiz.create(data).then((quiz) => {
             if (quiz) {
                 resolve({
                     status : statusCodes.created,
@@ -52,9 +50,34 @@ const getQuiz = function (query) {
     });
 };
 
-const addQuestion = function (data) {
+const addQuestion = function (query, data) {
     return new Promise((resolve,reject) => {
-        Quiz.findOneAndUpdate({quizId : data.quizId}, {$push : {questions : data.question}}, {new : true})
+        Quiz.findOneAndUpdate(query, {$push : {questions : data.question}}, {new : true})
+        .then((quiz) => {
+            if (quiz) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Question ${messages.added}`,
+                    data : quiz
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                })
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    });
+};
+
+const addQuestions = function (query, data) {
+    return new Promise((resolve,reject) => {
+        Quiz.findOneAndUpdate(query, {$push : {questions : {"$each" : data.questions}}}, {new : true})
         .then((quiz) => {
             if (quiz) {
                 resolve({
@@ -84,8 +107,33 @@ const getQuestionsByType = function (data) {
                 let questions = checkQuestionType(quiz,data.problemType);
                 resolve({
                     status : statusCodes.successful,
-                    message : `Question ${messages.added}`,
+                    message : `Question ${messages.found}`,
                     data : questions
+                })
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message: `Quiz ${messages.notFound}`
+                })
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        });
+    });
+};
+
+const getQuestionById = function (query,questionId) {
+    return new Promise((resolve,reject) => {
+        Quiz.find(query).then((quiz) => {
+            if (quiz) {
+                let question = quiz.find((question) => question._id === questionId);
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Question ${messages.found}`,
+                    data : question
                 })
             } else {
                 reject({
@@ -149,4 +197,4 @@ const changeActivation = function (data) {
     })
 }
 
-module.exports = {createQuiz, getQuiz, addQuestion, getQuestionsByType, deleteQuiz, changeActivation}
+module.exports = {createQuiz, getQuiz, addQuestion, addQuestions, getQuestionsByType, deleteQuiz, changeActivation, getQuestionById}
