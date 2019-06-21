@@ -1,6 +1,7 @@
 const Article = require ('./../DataBase/models/article');
 const {ObjectID} = require('mongodb');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
+const uuidv4 = require('uuid/v4');
+const {statusCodes, messages} = require ('../utilities/constants');
 
 const createArticle = function (data) {
     return new Promise((resolve,reject) => {
@@ -53,8 +54,9 @@ const getArticle = function (query) {
 const addComment = function (data) {
     return new Promise((resolve,reject) => {
         let comment = {
+            commentId : uuidv4(),
             comment : data.comment,
-            commentedBy : data.uuid
+            commentedBy : data.commentedBy
         }
         Article.findOneAndUpdate({articleId : data.articleId}, {$push : {comments : comment}}, {new : true}).then((article) => {
             if (article) {
@@ -81,7 +83,7 @@ const addComment = function (data) {
 
 const editComment = function (data) {
     return new Promise((resolve,reject) => {
-        Article.findOneAndUpdate({"articleId": data.articleId, "comments._id" : data.commentId} , {$set : {"comments.$.comment" : data.comment}}, {new:true})
+        Article.findOneAndUpdate({"articleId": data.articleId, "comments.commentId" : data.commentId} , {$set : {"comments.$.comment" : data.comment}}, {new:true})
         .then((article) => {
             if (article) {
                 resolve({
@@ -105,9 +107,9 @@ const editComment = function (data) {
 
 const getCommentById = function (data) {
     return new Promise((resolve,reject) => {
-        Article.findOne({"articleId": data.articleId, "comments._id" : data.commentId}).then((article) => {
+        Article.findOne({"articleId": data.articleId, "comments.commentId" : data.commentId}).then((article) => {
             if (article) {
-                let comment = article.comments.find((comments) => JSON.stringify(comments._id) === JSON.stringify(data.commentId));
+                let comment = article.comments.find((comments) => JSON.stringify(comments.commentId) === JSON.stringify(data.commentId));
                 resolve({
                     status : statusCodes.successful,
                     message : `Comment ${messages.found}`,
@@ -130,7 +132,7 @@ const getCommentById = function (data) {
 
 const deleteComment = function (data) {
     return new Promise((resolve,reject) => {
-        Article.findOneAndUpdate({"articleId": data.articleId, "comments._id" : data.commentId} , {$pull : {"comments" : {_id : data.commentId}}}, {multi:true})
+        Article.findOneAndUpdate({"articleId": data.articleId, "comments.commentId" : data.commentId} , {$pull : {"comments" : {commentId : data.commentId}}}, {multi:true})
         .then((article) => {
             if (article) {
                 resolve({

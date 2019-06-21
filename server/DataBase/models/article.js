@@ -23,8 +23,18 @@ let articleSchema = new mongoose.Schema({
     },
     content : {type : String},
     comments : [{
+        commentId : {type : String},
         comment : {type : String},
-        commentedBy : {type : String}
+        commentedBy : {
+            name : {
+                type : String,
+                required : true 
+            },
+            id : {
+                type : String,
+                required : true 
+            }
+        }
     }],
     likes : [String],
     approvedBy : {

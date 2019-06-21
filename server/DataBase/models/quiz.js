@@ -6,6 +6,7 @@ let QuizSchema = new mongoose.Schema({
         type : String,
         unique : true
     },
+    courseId : {type : String},
     name : {
         type : String,
         required : true,
@@ -32,9 +33,9 @@ let QuizSchema = new mongoose.Schema({
         }
     }],
     createdAt : {type : Date, default : Date.now},
-    createdBy : String,
+    createdBy : {type : String},
     updatedAt : {type : Date, default : Date.now},
-    updatedBy : String,
+    updatedBy : {type : String},
     active : {type : Boolean, default : false},
     imageUrl: {type : String, default : "images/container-bg.png"}
 });

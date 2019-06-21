@@ -12,11 +12,11 @@ let CourseSchema = new mongoose.Schema({
         minlength : 1,
         unique : true
     },
-    description : String,
+    description : {type : String},
     createdAt : {type : Date, default : Date.now},
-    createdBy : String,
+    createdBy : {type : String},
     updatedAt : {type : Date, default : Date.now},
-    updatedBy : String,
+    updatedBy : {type : String},
     active : {type : Boolean, default : false},
     imageUrl: {type : String, default : "images/container-bg.png"}
 });
