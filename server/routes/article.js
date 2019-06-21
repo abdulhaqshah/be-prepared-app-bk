@@ -86,7 +86,7 @@ router.get('/article/all', (req, res) => {
 });
 
 router.post('/article/:articleId/like/:userId', (req,res) => {
-    articleLibs.addLike({articleId : req.params.articleId, userId : req.params.userId}).then((article) =>{
+    articleLibs.addLike({articleId : req.params.articleId, userId : req.params.userId}).then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -95,7 +95,7 @@ router.post('/article/:articleId/like/:userId', (req,res) => {
 
 router.post('/article/:articleId/unlike/:userId', (req,res) => {
     articleLibs.removeLike({articleId : req.params.articleId, userId : req.params.userId})
-    .then((article) =>{
+    .then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -104,7 +104,7 @@ router.post('/article/:articleId/unlike/:userId', (req,res) => {
 
 router.post('/article/approvedBy/:articleId', (req,res) => {
     articleLibs.addLike({articleId : req.params.articleId}, {approvedBy : req.body.approvedBy})
-    .then((article) =>{
+    .then((article) => {
         res.status(article.status).send(article);
     }).catch((error) => {
         res.status(error.status).send(error);

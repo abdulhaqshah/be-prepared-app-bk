@@ -29,7 +29,7 @@ const createArticle = function (data) {
 const getArticle = function (query) {
     return new Promise((resolve,reject) => {
         Article.find(query).then((article) => {
-            if (article && aricle.length > 0) {
+            if (article && article.length > 0) {
                 resolve({
                     status : statusCodes.successful,
                     message : `Article/s ${messages.found}`, 
