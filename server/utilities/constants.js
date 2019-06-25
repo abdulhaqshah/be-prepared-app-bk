@@ -31,7 +31,8 @@ const messages = {
     liked        : "already liked",
     like         : "liked this blog",
     unlike       : "unliked this blog",
-    approved     : "has been approved"
+    approved     : "has been approved",
+    returned     : "has/have been returned"
 }
 
 const secretKeys = {

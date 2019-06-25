@@ -75,4 +75,60 @@ router.post('/user/uploadPhoto/:uuid', authenticate, (req,res) => {
     })
 })
 
+router.post('/user/addQuizForProgress', (req,res) => {
+    userLibs.addQuizIdForProgress({uuid : req.body.uuid}, req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.post('/user/updateQuizProgress', (req,res) => {
+    userLibs.updateQuizProgress(req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.patch('/user/updateQuizStatus', (req,res) => {
+    userLibs.quizCompleted(req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.patch('/user/updateTutorialStatus', (req,res) => {
+    userLibs.tutorialCompleted(req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.post('/user/addTutorialForProgress', (req,res) => {
+    userLibs.addTutorialIdForProgress({uuid : req.body.uuid}, req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.get('/user/getCompletedQuizzes', (req,res) => {
+    userLibs.getCompletedQuizzes({uuid : req.body.uuid}, req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.get('/user/getCompletedTutorials', (req,res) => {
+    userLibs.getCompletedTutorials({uuid : req.body.uuid}, req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
 module.exports = router;

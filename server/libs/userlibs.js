@@ -288,4 +288,178 @@ const uploadPhoto = function(req) {
     })
 };
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto}
+const updateQuizProgress = function(data) {
+    return new Promise((resolve,reject) => {
+        if (data.answer) {
+            User.updateOne({uuid: data.uuid, "quizProgress.quizId" : data.quizId} , {$push : {"quizProgress.$.attempted" : data.questionId, "quizProgress.$.correct" : data.questionId}}, {new:true})
+        .then((doc) => {
+            resolve({
+                status : statusCodes.successful,
+                message : `Quiz's progress ${messages.updated}`
+            });
+        }).catch((e) => {
+            reject({
+                status : statusCodes.notFound,
+                message : `User ${messages.notFound}`
+            });
+        })
+        } else {
+            User.updateOne({uuid: data.uuid, "quizProgress.quizId" : data.quizId} , {$push : {"quizProgress.$.attempted" : data.questionId, "quizProgress.$.failed" : data.questionId}}, {new:true})
+            .then((doc) => {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Quiz's progress ${messages.updated}`
+                });
+            }).catch((error) => {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            })
+        }
+    })
+}
+
+const quizCompleted = function(data) {
+    return new Promise((resolve,reject) => {
+        User.updateOne({uuid: data.uuid, "quizProgress.quizId" : data.quizId}, {$set : {"quizProgress.$.completed" : true}}, {new:true})
+        .then((doc) => {
+            if(doc){
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Quiz's progress ${messages.updated}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                data : error  
+            })
+        })
+    })
+}
+
+const addQuizIdForProgress = function (query, data) {
+    return new Promise((resolve,reject) => {
+        let quizProgres = {
+            quizId : data.quizId,
+            courseId : data.courseId
+        }
+        User.findOneAndUpdate(query, {$push : {quizProgress : quizProgres}}, {new:true})
+        .then((user) => {
+            if (user) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Quiz's progress ${messages.updated}`,
+                    data : user.quizProgress
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                data : error
+            })
+        })
+    })
+}
+
+const addTutorialIdForProgress = function (query, data) {
+    return new Promise((resolve,reject) => {
+        let tutorialProgres = {
+            tutorialId : data.quizId,
+            courseId : data.courseId
+        }
+        User.findOneAndUpdate(query, {$push : {tutorialProgress : tutorialProgres}}, {new:true})
+        .then((user) => {
+            if (user) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Tutorial's progress ${messages.updated}`,
+                    data : user.tutorialProgress
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                data : error
+            })
+        })
+    })
+}
+
+const tutorialCompleted = function(data) {
+    return new Promise((resolve,reject) => {
+        User.updateOne({uuid: data.uuid, "tutorialProgress.tutorialId" : data.tutorialId}, {$set : {"tutorialProgress.$.completed" : true}}, {new:true})
+        .then((doc) => {
+            if(doc){
+                resolve({
+                    status : statusCodes.successful,
+                    message : `Tutorial's progress ${messages.updated}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                data : error  
+            })
+        })
+    })
+}
+
+const getCompletedQuizzes = function (query, data) {
+    return new Promise((resolve,reject) => {
+        getUser(query).then((user) => {
+            let completedQuizzes = user.quizProgress.filter((quiz) => (quiz.courseId === data.courseId && quiz.completed === true));
+            resolve({
+                status : statusCodes.successful,
+                message : `Completed quizzes ${messages.returned}`,
+                data : completedQuizzes
+            });
+        }).catch((error) => {
+            reject({
+                status : error.status,
+                data : error  
+            })
+        })
+    })
+}
+
+const getCompletedTutorials = function (query, data) {
+    return new Promise((resolve,reject) => {
+        getUser(query).then((user) => {
+            let completedTutorials = user.tutorialProgress.filter((tutorial) => (tutorial.courseId === data.courseId && tutorial.completed === true));
+            resolve({
+                status : statusCodes.successful,
+                message : `Completed tutorials ${messages.returned}`,
+                data : completedTutorials
+            });
+        }).catch((error) => {
+            reject({
+                status : error.status,
+                data : error  
+            })
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addQuizIdForProgress, addTutorialIdForProgress, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials}

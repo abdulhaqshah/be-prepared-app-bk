@@ -1,6 +1,7 @@
 const Quiz = require('../DataBase/models/quiz');
-const {statusCodes, messages, secretKeys, timeScale} = require ('../utilities/constants');
-const {checkQuestionType, checkUserId} = require('../utilities/utilityFunctions')
+const {statusCodes, messages} = require ('../utilities/constants');
+const uuidv4 = require('uuid/v4');
+const {checkQuestionType} = require('../utilities/utilityFunctions');
 
 const createQuiz = function (data) {
     return new Promise((resolve,reject) => {
@@ -51,6 +52,7 @@ const getQuiz = function (query) {
 };
 
 const addQuestion = function (query, data) {
+    data.question.questionId = uuidv4();
     return new Promise((resolve,reject) => {
         Quiz.findOneAndUpdate(query, {$push : {questions : data.question}}, {new : true})
         .then((quiz) => {
@@ -76,6 +78,9 @@ const addQuestion = function (query, data) {
 };
 
 const addQuestions = function (query, data) {
+    data.questions.forEach(function(element) {
+        element.questionId = uuidv4();
+      });
     return new Promise((resolve,reject) => {
         Quiz.findOneAndUpdate(query, {$push : {questions : {"$each" : data.questions}}}, {new : true})
         .then((quiz) => {
@@ -129,7 +134,7 @@ const getQuestionById = function (query,questionId) {
     return new Promise((resolve,reject) => {
         Quiz.find(query).then((quiz) => {
             if (quiz) {
-                let question = quiz.find((question) => question._id === questionId);
+                let question = quiz.find((question) => question.questionId === questionId);
                 resolve({
                     status : statusCodes.successful,
                     message : `Question ${messages.found}`,

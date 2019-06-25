@@ -14,6 +14,7 @@ let QuizSchema = new mongoose.Schema({
         unique : true
     },
     questions :[{
+        questionId : {type : String},
         problemType: {
             type : String
         },

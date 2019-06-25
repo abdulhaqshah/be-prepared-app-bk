@@ -29,7 +29,7 @@ router.post('/quiz/addQuestion/:quizId', (req, res) => {
 });
 
 router.post('/quiz/addQuestions/:quizId', (req, res) => {
-    quizLibs.addQuestion({quizId : req.params.quizId}, req.body).then((quiz) => {
+    quizLibs.addQuestions({quizId : req.params.quizId}, req.body).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
         res.status(error.status).send(error);
