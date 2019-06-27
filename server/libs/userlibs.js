@@ -291,31 +291,46 @@ const uploadPhoto = function(req) {
 const updateQuizProgress = function(data) {
     return new Promise((resolve,reject) => {
         if (data.answer) {
-            User.updateOne({uuid: data.uuid, "quizProgress.quizId" : data.quizId} , {$push : {"quizProgress.$.attempted" : data.questionId, "quizProgress.$.correct" : data.questionId}}, {new:true})
-        .then((doc) => {
-            resolve({
-                status : statusCodes.successful,
-                message : `Quiz's progress ${messages.updated}`
-            });
-        }).catch((e) => {
-            reject({
-                status : statusCodes.notFound,
-                message : `User ${messages.notFound}`
-            });
-        })
-        } else {
-            User.updateOne({uuid: data.uuid, "quizProgress.quizId" : data.quizId} , {$push : {"quizProgress.$.attempted" : data.questionId, "quizProgress.$.failed" : data.questionId}}, {new:true})
-            .then((doc) => {
+            User.updateOne({
+                uuid : data.uuid, 
+                "quizProgress.quizId" : data.quizId
+            } , {$push : {
+                "quizProgress.$.attempted" : data.questionId, 
+                "quizProgress.$.correct" : data.questionId
+            }} , {
+                new : true
+            }).then((doc) => {
                 resolve({
                     status : statusCodes.successful,
                     message : `Quiz's progress ${messages.updated}`
                 });
-            }).catch((error) => {
+            }).catch((e) => {
                 reject({
                     status : statusCodes.notFound,
                     message : `User ${messages.notFound}`
                 });
             })
+        } else {
+            User.updateOne({
+                uuid: data.uuid,
+                "quizProgress.quizId" : data.quizId
+            } , {$push :
+                {
+                    "quizProgress.$.attempted" : data.questionId, 
+                    "quizProgress.$.failed" : data.questionId
+                }}, {
+                    new : true
+                }).then((doc) => {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Quiz's progress ${messages.updated}`
+                    });
+                }).catch((error) => {
+                    reject({
+                        status : statusCodes.notFound,
+                        message : `User ${messages.notFound}`
+                    });
+                })
         }
     })
 }
@@ -344,7 +359,7 @@ const quizCompleted = function(data) {
     })
 }
 
-const addQuizIdForProgress = function (query, data) {
+const addingQuizToUser = function (query, data) {
     return new Promise((resolve,reject) => {
         let quizProgres = {
             quizId : data.quizId,
@@ -373,10 +388,10 @@ const addQuizIdForProgress = function (query, data) {
     })
 }
 
-const addTutorialIdForProgress = function (query, data) {
+const addingTutorialToUser = function (query, data) {
     return new Promise((resolve,reject) => {
         let tutorialProgres = {
-            tutorialId : data.quizId,
+            tutorialId : data.tutorialId,
             courseId : data.courseId
         }
         User.findOneAndUpdate(query, {$push : {tutorialProgress : tutorialProgres}}, {new:true})
@@ -426,9 +441,9 @@ const tutorialCompleted = function(data) {
     })
 }
 
-const getCompletedQuizzes = function (query, data) {
+const getCompletedQuizzes = function (data) {
     return new Promise((resolve,reject) => {
-        getUser(query).then((user) => {
+        getUser({uuid : data.uuid}).then((user) => {
             let completedQuizzes = user.quizProgress.filter((quiz) => (quiz.courseId === data.courseId && quiz.completed === true));
             resolve({
                 status : statusCodes.successful,
@@ -444,9 +459,9 @@ const getCompletedQuizzes = function (query, data) {
     })
 }
 
-const getCompletedTutorials = function (query, data) {
+const getCompletedTutorials = function (data) {
     return new Promise((resolve,reject) => {
-        getUser(query).then((user) => {
+        getUser({uuid : data.uuid}).then((user) => {
             let completedTutorials = user.tutorialProgress.filter((tutorial) => (tutorial.courseId === data.courseId && tutorial.completed === true));
             resolve({
                 status : statusCodes.successful,
@@ -462,4 +477,4 @@ const getCompletedTutorials = function (query, data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addQuizIdForProgress, addTutorialIdForProgress, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials}
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials}

@@ -20,15 +20,7 @@ router.get('/quiz/quizById/:quizId', (req, res) => {
     });
 });
 
-router.post('/quiz/addQuestion/:quizId', (req, res) => {
-    quizLibs.addQuestion({quizId : req.params.quizId}, req.body).then((quiz) => {
-        res.status(quiz.status).send(quiz);
-    }).catch((error) => {
-        res.status(error.status).send(error);
-    });
-});
-
-router.post('/quiz/addQuestions/:quizId', (req, res) => {
+router.post('/quiz/:quizId/question/add', (req, res) => {
     quizLibs.addQuestions({quizId : req.params.quizId}, req.body).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
@@ -44,7 +36,7 @@ router.get('/quiz/questionByType/:problemType', (req, res) => {
 });
 
 router.get('/quiz/quiz/:quizId/questionById/:questionId', (req, res) => {
-    quizLibs.getQuestionsByType({quizId : req.params.quizId}, req.params.questionId).then((quiz) => {
+    quizLibs.getQuestionById({quizId : req.params.quizId}, req.params.questionId).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
         res.status(error.status).send(error);
