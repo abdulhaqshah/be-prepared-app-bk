@@ -30,11 +30,18 @@ let UserSchema = new mongoose.Schema({
         required: true,
         minlength : 6
     },
-    progress : [{
-        course : String,
-        totalQuestions : Number,
-        completedQuestions : {type : Number, default : 0},
-        score : {type : Number, default : 0}
+    quizProgress : [{
+        quizId : {type : String},
+        courseId : {type : String},
+        attempted : [{type : String}],
+        correct : [{type : String}],
+        failed : [{type : String}],
+        completed : {type : Boolean, default : false}
+    }],
+    tutorialProgress : [{
+        tutorialId : {type : String},
+        courseId : {type : String},
+        completed : {type : Boolean, default : false}
     }],
     deActivate : {type : Boolean, default : false},
     deActivatedAt : {type : Date, default : null},

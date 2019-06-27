@@ -75,4 +75,94 @@ router.post('/user/uploadPhoto/:uuid', authenticate, (req,res) => {
     })
 })
 
+router.post('/user/:uuid/quiz/:quizId/start/:courseId', (req,res) => {
+    userLibs.addingQuizToUser(
+    {
+        uuid : req.params.uuid
+    }, 
+    {
+        quizId : req.params.quizId, 
+        courseId : req.params.courseId
+    }
+    )
+    .then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.post('/user/:uuid/quiz/:quizId/updateProgress/:questionId', (req,res) => {
+    userLibs.updateQuizProgress({
+        uuid : req.params.uuid,
+        quizId : req.params.quizId,
+        questionId : req.params.questionId,
+        answer : req.body.answer
+    }).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.patch('/user/:uuid/quiz/:quizId/updateStatus', (req,res) => {
+    userLibs.quizCompleted({
+        uuid : req.params.uuid,
+        quizId : req.params.quizId
+    }).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.patch('/user/:uuid/tutorial/:tutorialId/updateStatus', (req,res) => {
+    userLibs.tutorialCompleted({
+        uuid : req.params.uuid,
+        tutorialId : req.params.tutorialId
+    }).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.post('/user/:uuid/tutorial/:tutorialId/start/:courseId', (req,res) => {
+    userLibs.addingTutorialToUser(
+    {
+        uuid : req.params.uuid
+    }, 
+    {
+        tutorialId : req.params.tutorialId, 
+        courseId : req.params.courseId
+    }
+    ).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.get('/user/:uuid/quiz/completed/:courseId', (req,res) => {
+    userLibs.getCompletedQuizzes({
+        uuid : req.params.uuid,
+        courseId : req.params.courseId
+    }).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.get('/user/:uuid/tutorial/completed/:courseId', (req,res) => {
+    userLibs.getCompletedTutorials({
+        uuid : req.params.uuid,
+        courseId : req.params.courseId
+    }).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
 module.exports = router;
