@@ -19,11 +19,17 @@ const createQuiz = function (data) {
                 })
             }
         }).catch((error) => {
+            if(error.code === 11000) {
+                reject({
+                    status : statusCodes.badRequest,
+                    message: `Email ${messages.duplicate}`   
+                })
+            }
             reject({
                 status : statusCodes.badRequest,
                 error
             });
-        });
+        })
     });
 };
 
