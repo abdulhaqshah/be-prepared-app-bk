@@ -19,11 +19,17 @@ const createCourse = function (data) {
                 })
             }
         }).catch((error) => {
+            if(error.code === 11000) {
+                reject({
+                    status : statusCodes.badRequest,
+                    message: `Course ${messages.duplicate}`   
+                })
+            }
             reject({
                 status : statusCodes.badRequest,
                 error
             });
-        });
+        })
     });
 };
 
