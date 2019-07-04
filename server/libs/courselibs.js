@@ -22,7 +22,7 @@ const createCourse = function (data) {
             if(error.code === 11000) {
                 reject({
                     status : statusCodes.badRequest,
-                    message: `Email ${messages.duplicate}`   
+                    message: `Course ${messages.duplicate}`   
                 })
             }
             reject({

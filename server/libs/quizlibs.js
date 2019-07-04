@@ -22,7 +22,7 @@ const createQuiz = function (data) {
             if(error.code === 11000) {
                 reject({
                     status : statusCodes.badRequest,
-                    message: `Email ${messages.duplicate}`   
+                    message: `Quiz ${messages.duplicate}`   
                 })
             }
             reject({
