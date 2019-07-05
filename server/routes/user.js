@@ -165,7 +165,7 @@ router.get('/user/:uuid/tutorial/completed/:courseId', (req,res) => {
     })
 })
 
-router.patch(' /user/:uuid/update/about', (req,res) => {
+router.patch('/user/:uuid/update/about', (req,res) => {
     userLibs.updateAboutInfo({
         uuid : req.params.uuid
     }, req.body).then((user) => {
