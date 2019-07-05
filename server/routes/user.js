@@ -165,4 +165,14 @@ router.get('/user/:uuid/tutorial/completed/:courseId', (req,res) => {
     })
 })
 
+router.patch(' /user/:uuid/update/about', (req,res) => {
+    userLibs.updateAboutInfo({
+        uuid : req.params.uuid
+    }, req.body).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
 module.exports = router;

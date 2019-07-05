@@ -477,4 +477,30 @@ const getCompletedTutorials = function (data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials}
+const updateAboutInfo = function (query, data) {
+    return new Promise((resolve,reject) => {
+        User.findOneAndUpdate(query, {$set : {about : data.about}}, {new:true})
+        .then((user) => {
+            if (user) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User's about information ${messages.updated}`,
+                    data : user.about
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : error.status,
+                data : error  
+            })
+        })
+
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo}
