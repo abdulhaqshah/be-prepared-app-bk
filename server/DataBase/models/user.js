@@ -43,6 +43,7 @@ let UserSchema = new mongoose.Schema({
         courseId : {type : String},
         completed : {type : Boolean, default : false}
     }],
+    about : {type : String, default : "Tell us about who you are ..."},
     deActivate : {type : Boolean, default : false},
     deActivatedAt : {type : Date, default : null},
     deActivatedBy : {type : String, default : ''},
