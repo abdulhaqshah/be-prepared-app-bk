@@ -32,7 +32,8 @@ const messages = {
     like         : "liked this blog",
     unlike       : "unliked this blog",
     approved     : "has been approved",
-    returned     : "has/have been returned"
+    returned     : "has/have been returned",
+    cannotLogin  : "Email or password is invalid"
 }
 
 const secretKeys = {

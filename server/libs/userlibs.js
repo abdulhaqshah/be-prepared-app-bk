@@ -71,29 +71,39 @@ const logIn = function (body) {
             email : body.email,
             deActivate : false
         }
-        getUser(query).then((user) => {
-            bcrypt.compare(body.password, user.password , (err,result) => {            
-                if (result) {
-                    const uuid = user.uuid;
-                    let payload = {
-                        _id : uuid,
-                        createdTime : Date.now()
+        User.findOne(query).then((user) => {
+            if (user) {
+                bcrypt.compare(body.password, user.password , (err,result) => {            
+                    if (result) {
+                        const uuid = user.uuid;
+                        let payload = {
+                            _id : uuid,
+                            createdTime : Date.now()
+                        }
+                        let token = jwt.sign(payload, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `Login ${messages.successful}`,
+                            data : {user,token}
+                        });
+                    } else {
+                        reject({
+                            status : statusCodes.forBidden,
+                            message : `${messages.cannotLogin}`
+                        });
                     }
-                    let token = jwt.sign(payload, secretKeys.tokenKey, process.env.JWT_SECRET, {expiresIn: '2d'}).toString();
-                    resolve({
-                        status : statusCodes.successful,
-                        message : `Login ${messages.successful}`,
-                        data : {user,token}
-                    });
-                } else {
-                    reject({
-                        status : statusCodes.forBidden,
-                        message : `Password ${messages.notMatch}`
-                    });
-                }
-            })
+                })
+            } else {
+                reject({
+                    status : statusCodes.forBidden,
+                    message : `${messages.cannotLogin}`
+                });
+            }
         }).catch((error) => {
-            reject(error);
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
         })
     })
 };
