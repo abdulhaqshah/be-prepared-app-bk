@@ -89,14 +89,14 @@ const logIn = function (body) {
                     } else {
                         reject({
                             status : statusCodes.forBidden,
-                            message : `${messages.cannotLogin}`
+                            message : `${messages.invalidLogin}`
                         });
                     }
                 })
             } else {
                 reject({
                     status : statusCodes.forBidden,
-                    message : `${messages.cannotLogin}`
+                    message : `${messages.invalidLogin}`
                 });
             }
         }).catch((error) => {
