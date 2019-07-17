@@ -45,8 +45,8 @@ const timeScale = {
 }
 
 const imageFolder = {
-    userPath : "public/userimages",
-    tutorialPath : "public/tutorialimages"
+    userPath : "assets/userimages",
+    tutorialPath : "assets/tutorialimages"
 }
 
 module.exports = {statusCodes, messages, secretKeys, timeScale, imageFolder}
