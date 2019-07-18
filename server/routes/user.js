@@ -75,6 +75,14 @@ router.post('/user/uploadPhoto/:uuid', authenticate, (req,res) => {
     })
 })
 
+router.post('/user/uploadImage/:uuid', userLibs.upload.single('imageData'), authenticate, (req,res) => {
+    userLibs.uploadImage(req).then((success) => {
+        res.status(success.status).send(success);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
 router.post('/user/:uuid/quiz/:quizId/start/:courseId', (req,res) => {
     userLibs.addingQuizToUser(
     {

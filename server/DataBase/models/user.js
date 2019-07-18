@@ -49,7 +49,8 @@ let UserSchema = new mongoose.Schema({
     deActivatedBy : {type : String, default : ''},
     updatedAt : {type : Date, default : Date.now},
     isAdmin : {type : Boolean, default : false},
-    image: {type : String, default : "images/container-bg.png"}
+    imageData: {type : String, required : true},
+    imageName: {type : String, required : true}
 });
 
 UserSchema.pre('save' , function(next) {

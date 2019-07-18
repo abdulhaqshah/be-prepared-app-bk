@@ -8,6 +8,7 @@ const {port, publicPath} = require('./config/port');
 const app = express();
 
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 app.use(express.static(publicPath));
 app.use(bodyParser.json());
 

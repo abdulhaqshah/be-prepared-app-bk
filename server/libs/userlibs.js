@@ -2,6 +2,7 @@ const User = require ('../DataBase/models/user');
 const formidable = require('formidable');
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 const {validateFields, decodeToken} = require('./../utilities/utilityFunctions');
 const {createToken} = require('./tokenlibs');
 const {statusCodes, messages, secretKeys, timeScale, imageFolder} = require ('../utilities/constants');
@@ -513,4 +514,56 @@ const updateAboutInfo = function (query, data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo}
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter
+});
+
+const uploadImage = function(req) {
+    return new Promise((resolve,reject) => {
+            User.findOneAndUpdate(
+                {uuid : req.params.uuid}, 
+                {$set :{"imageName" : req.body.imageName, "imageData" : req.file.path}}, 
+                {new: true}, 
+                (error, doc) => {
+                if (doc) {
+                    resolve({
+                        status : statusCodes.successful,
+                        message : `Photo ${messages.updated}`, 
+                        data : {
+                            path : doc.imageData,
+                            name : doc.imageName
+                        }
+                    });
+                } else {
+                    reject({
+                        status : statusCodes.badRequest,
+                        data : 'error'   
+                    })
+                }
+            }
+            )
+        })
+};
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo, upload, uploadImage}
