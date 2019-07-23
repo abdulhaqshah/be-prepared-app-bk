@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:dev": "nodemon server/app.js --exec 'npm run pretest && node'",
-    "start:prod": "nodemon server/app.js",
+    "start:dev": "nodemon server/app.js --exec 'npm install && npm run pretest && node'",
+    "start:prod": "npm install && nodemon server/app.js",
     "pretest": "eslint --ignore-path .gitignore .",
     "test": "export NODE_ENV=test && mocha **/*.test.js",
     "test-watch": "nodemon --exec 'npm test'"
