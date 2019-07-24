@@ -175,4 +175,13 @@ router.patch('/user/:uuid/update/about', (req,res) => {
     })
 })
 
+
+router.get('/user/emailExist', (req,res) => {
+    userLibs.checkByEmail({email : req.body.email}).then((user) => {
+        res.status(user.status).send(user);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
 module.exports = router;
