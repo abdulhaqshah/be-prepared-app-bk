@@ -176,7 +176,7 @@ router.patch('/user/:uuid/update/about', (req,res) => {
 })
 
 
-router.get('/user/emailExist', (req,res) => {
+router.post('/user/emailExist', (req,res) => {
     userLibs.checkByEmail({email : req.body.email}).then((user) => {
         res.status(user.status).send(user);
     }).catch((error) => {
