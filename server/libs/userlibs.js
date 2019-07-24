@@ -513,4 +513,27 @@ const updateAboutInfo = function (query, data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo}
+const checkByEmail = function(query) {
+    return new Promise((resolve,reject) => {
+        User.findOne(query).then((user) => {
+            if (user) {
+                resolve({
+                    status : statusCodes.successful,
+                    message : `User ${messages.exist}`
+                });
+            } else {
+                reject({
+                    status : statusCodes.notFound,
+                    message : `User ${messages.notFound}`
+                });
+            }
+        }).catch((error) => {
+            reject({
+                status : statusCodes.badRequest,
+                error
+            });
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo, checkByEmail}
