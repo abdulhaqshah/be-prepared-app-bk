@@ -519,7 +519,8 @@ const checkByEmail = function(query) {
             if (user) {
                 resolve({
                     status : statusCodes.successful,
-                    message : `User ${messages.exist}`
+                    message : `User ${messages.exist}`,
+                    data : user
                 });
             } else {
                 reject({
