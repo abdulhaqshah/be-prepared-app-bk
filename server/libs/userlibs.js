@@ -536,4 +536,35 @@ const checkByEmail = function(query) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo, checkByEmail}
+const updatePassword = function(data) {
+    return new Promise((resolve,reject) => {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(data.password, salt, (err,hash) => {
+                let newPassword = hash;
+                User.findOneAndUpdate({email : data.email, deActivate : false}, {$set : {password : newPassword}}, {new: true})
+                .then((user) => {
+                    if (user) {
+                        resolve({
+                            status : statusCodes.successful,
+                            message : `Password ${messages.updated}`, 
+                            data : data.password
+                        });
+                    } else {
+                        reject({
+                            status : statusCodes.notFound,
+                            message : `User ${messages.notFound}`
+                        });
+                    }
+                }).catch((error) => {
+                    reject({
+                        status : statusCodes.badRequest,
+                        error   
+                    })
+                })
+
+            })
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo, checkByEmail, updatePassword}
