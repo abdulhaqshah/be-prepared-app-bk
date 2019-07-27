@@ -13,7 +13,7 @@ router.post('/tutorial/new', (req, res) => {
 });
 
 router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
-    tutorialLibs.getTutorial({tutorialId : req.params.tutorialId, active : true}).then((tutorial) => {
+    tutorialLibs.getTutorial({tutorialId : req.params.tutorialId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -21,7 +21,7 @@ router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
 });
 
 router.get('/tutorial/tutorialByCourse/:courseId', (req, res) => {
-    tutorialLibs.getTutorial({courseId : req.params.courseId, active : true}).then((tutorial) => {
+    tutorialLibs.getTutorial({courseId : req.params.courseId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -46,7 +46,7 @@ router.get('/tutorial/allInActive', (req, res) => {
 
 router.patch('/tutorial/update/:tutorialId', (req,res) => {
     req.body.updatedBy = req.header('uuid');
-    tutorialLibs.updateTutorial({tutorialId : req.params.tutorialId, active : true}, req.body)
+    tutorialLibs.updateTutorial({tutorialId : req.params.tutorialId}, req.body)
     .then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {

@@ -13,7 +13,15 @@ router.post('/quiz/new', (req, res) => {
 });
 
 router.get('/quiz/quizById/:quizId', (req, res) => {
-    quizLibs.getQuiz({quizId : req.params.quizId, active : true}).then((quiz) => {
+    quizLibs.getQuiz({quizId : req.params.quizId}).then((quiz) => {
+        res.status(quiz.status).send(quiz);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    });
+});
+
+router.get('/quiz/quizByCourse/:courseId', (req, res) => {
+    quizLibs.getQuiz({courseId : req.params.courseId}).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
         res.status(error.status).send(error);
