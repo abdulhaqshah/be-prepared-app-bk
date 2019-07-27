@@ -12,7 +12,7 @@ router.post('/course/new', (req, res) => {
 });
 
 router.get('/course/courseById/:courseId', (req, res) => {
-    courseLibs.getCourse({courseId : req.params.courseId, active : true}).then((course) => {
+    courseLibs.getCourse({courseId : req.params.courseId}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
         res.status(error.status).send(error);
@@ -21,7 +21,7 @@ router.get('/course/courseById/:courseId', (req, res) => {
 
 router.patch('/course/update/:courseId', (req,res) => {
     req.body.updatedBy = req.header('uuid');
-    courseLibs.updateTutorial({courseId : req.params.courseId, active : true}, req.body)
+    courseLibs.updateCourse({courseId : req.params.courseId}, req.body)
     .then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {
