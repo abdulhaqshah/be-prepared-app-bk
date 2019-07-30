@@ -12,7 +12,7 @@ router.post('/quiz/new', (req, res) => {
     });
 });
 
-router.get('/quiz/:quizId', (req, res) => {
+router.get('/quiz/quizById/:quizId', (req, res) => {
     quizLibs.getQuiz({quizId : req.params.quizId}).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
