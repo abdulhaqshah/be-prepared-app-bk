@@ -16,6 +16,9 @@ let TutorialSchema = new mongoose.Schema({
     content : {
         type : String
     },
+    description : {
+        type : String
+    },
     tags : [String],
     category : {type : String},
     createdAt : {type : Date, default : Date.now},

@@ -33,6 +33,9 @@ let QuizSchema = new mongoose.Schema({
             default : "single"
         }
     }],
+    description : {
+        type : String
+    },
     createdAt : {type : Date, default : Date.now},
     createdBy : {type : String},
     updatedAt : {type : Date, default : Date.now},
