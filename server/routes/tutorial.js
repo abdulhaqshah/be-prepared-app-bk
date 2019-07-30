@@ -12,7 +12,7 @@ router.post('/tutorial/new', (req, res) => {
     });
 });
 
-router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
+router.get('/tutorial/:tutorialId', (req, res) => {
     tutorialLibs.getTutorial({tutorialId : req.params.tutorialId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
@@ -20,7 +20,7 @@ router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
     });
 });
 
-router.get('/tutorial/tutorialByCourse/:courseId', (req, res) => {
+router.get('/tutorial/course/:courseId', (req, res) => {
     tutorialLibs.getTutorial({courseId : req.params.courseId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {

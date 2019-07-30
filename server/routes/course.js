@@ -11,7 +11,7 @@ router.post('/course/new', (req, res) => {
     });
 });
 
-router.get('/course/courseById/:courseId', (req, res) => {
+router.get('/course/:courseId', (req, res) => {
     courseLibs.getCourse({courseId : req.params.courseId}).then((course) => {
         res.status(course.status).send(course);
     }).catch((error) => {

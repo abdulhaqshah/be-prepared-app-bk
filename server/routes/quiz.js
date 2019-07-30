@@ -12,7 +12,7 @@ router.post('/quiz/new', (req, res) => {
     });
 });
 
-router.get('/quiz/quizById/:quizId', (req, res) => {
+router.get('/quiz/:quizId', (req, res) => {
     quizLibs.getQuiz({quizId : req.params.quizId}).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
@@ -20,7 +20,7 @@ router.get('/quiz/quizById/:quizId', (req, res) => {
     });
 });
 
-router.get('/quiz/quizByCourse/:courseId', (req, res) => {
+router.get('/quiz/course/:courseId', (req, res) => {
     quizLibs.getQuiz({courseId : req.params.courseId}).then((quiz) => {
         res.status(quiz.status).send(quiz);
     }).catch((error) => {
