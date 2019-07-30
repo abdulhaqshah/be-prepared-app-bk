@@ -12,7 +12,7 @@ router.post('/tutorial/new', (req, res) => {
     });
 });
 
-router.get('/tutorial/:tutorialId', (req, res) => {
+router.get('/tutorial/tutorialById/:tutorialId', (req, res) => {
     tutorialLibs.getTutorial({tutorialId : req.params.tutorialId}).then((tutorial) => {
         res.status(tutorial.status).send(tutorial);
     }).catch((error) => {
