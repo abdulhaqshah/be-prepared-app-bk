@@ -373,7 +373,9 @@ const addingQuizToUser = function (query, data) {
     return new Promise((resolve,reject) => {
         let quizProgres = {
             quizId : data.quizId,
-            courseId : data.courseId
+            courseId : data.courseId,
+            name : data.name,
+            description : data.description
         }
         User.findOneAndUpdate(query, {$push : {quizProgress : quizProgres}}, {new:true})
         .then((user) => {
@@ -402,7 +404,9 @@ const addingTutorialToUser = function (query, data) {
     return new Promise((resolve,reject) => {
         let tutorialProgres = {
             tutorialId : data.tutorialId,
-            courseId : data.courseId
+            courseId : data.courseId,
+            name : data.name,
+            description : data.description
         }
         User.findOneAndUpdate(query, {$push : {tutorialProgress : tutorialProgres}}, {new:true})
         .then((user) => {
@@ -567,4 +571,18 @@ const updatePassword = function(data) {
     })
 }
 
-module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo, checkByEmail, updatePassword}
+const getUserById = function(query) {
+    return new Promise((resolve,reject) => {
+        getUser(query).then((user) => {
+            resolve({
+                status : statusCodes.successful,
+                message : `User ${messages.found}`, 
+                data : user
+            });
+        }).catch((error) => {
+            reject(error)
+        })
+    })
+}
+
+module.exports = {register, logIn, updateUser, logOut , changePassword, deleteUser, deActivateUser, getUser, uploadPhoto, updateQuizProgress, quizCompleted, addingQuizToUser, addingTutorialToUser, tutorialCompleted, getCompletedQuizzes, getCompletedTutorials, updateAboutInfo, checkByEmail, updatePassword, getUserById}

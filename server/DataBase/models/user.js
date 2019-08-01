@@ -31,6 +31,8 @@ let UserSchema = new mongoose.Schema({
         minlength : 6
     },
     quizProgress : [{
+        name : {type : String},
+        description : {type : String},
         quizId : {type : String},
         courseId : {type : String},
         attempted : [{type : String}],
@@ -39,6 +41,8 @@ let UserSchema = new mongoose.Schema({
         completed : {type : Boolean, default : false}
     }],
     tutorialProgress : [{
+        name : {type : String},
+        description : {type : String},
         tutorialId : {type : String},
         courseId : {type : String},
         completed : {type : Boolean, default : false}

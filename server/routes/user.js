@@ -82,7 +82,9 @@ router.post('/user/:uuid/quiz/:quizId/start/:courseId', (req,res) => {
     }, 
     {
         quizId : req.params.quizId, 
-        courseId : req.params.courseId
+        courseId : req.params.courseId,
+        name : req.body.name,
+        desccription : req.body.description
     }
     )
     .then((user) => {
@@ -134,7 +136,9 @@ router.post('/user/:uuid/tutorial/:tutorialId/start/:courseId', (req,res) => {
     }, 
     {
         tutorialId : req.params.tutorialId, 
-        courseId : req.params.courseId
+        courseId : req.params.courseId,
+        name : req.body.name,
+        description : req.body.description
     }
     ).then((user) => {
         res.status(user.status).send(user);
@@ -186,6 +190,14 @@ router.get('/user/emailExist/:email', (req,res) => {
 
 router.patch('/user/updatePassword', (req,res) => {
     userLibs.updatePassword(req.body).then((success) => {
+        res.status(success.status).send(success);
+    }).catch((error) => {
+        res.status(error.status).send(error);
+    })
+})
+
+router.get('/user/userById/:uuid', (req,res) => {
+    userLibs.getUserById({uuid : req.params.uuid}).then((success) => {
         res.status(success.status).send(success);
     }).catch((error) => {
         res.status(error.status).send(error);
