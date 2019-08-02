@@ -377,24 +377,40 @@ const addingQuizToUser = function (query, data) {
             name : data.name,
             description : data.description
         }
-        User.findOneAndUpdate(query, {$push : {quizProgress : quizProgres}}, {new:true})
-        .then((user) => {
-            if (user) {
-                resolve({
-                    status : statusCodes.successful,
-                    message : `Quiz's progress ${messages.updated}`,
-                    data : user.quizProgress
-                });
-            } else {
-                reject({
-                    status : statusCodes.notFound,
-                    message : `User ${messages.notFound}`
-                });
+        User.findOne(query).then((user) => {
+            if(user) {
+                let found = user.quizProgress.find((quiz) => quiz.quizId === data.quizId)
+                if(found) {
+                    reject({
+                        status : statusCodes.forBidden,
+                        message : `Quiz ${messages.alreadyInProgress}`
+                    })
+                } else {
+                    User.findOneAndUpdate(query, {$push : {quizProgress : quizProgres}}, {new:true})
+                    .then((user) => {
+                        if (user) {
+                            resolve({
+                                status : statusCodes.successful,
+                                message : `Quiz's progress ${messages.updated}`,
+                                data : user.quizProgress
+                            });
+                        } else {
+                            reject({
+                                status : statusCodes.notFound,
+                                message : `User ${messages.notFound}`
+                            });
+                        }
+                    }).catch((error) => {
+                        reject({
+                            status : statusCodes.badRequest,
+                            data : error
+                        })
+                    })
+                }
             }
-        }).catch((error) => {
             reject({
-                status : statusCodes.badRequest,
-                data : error
+                status : statusCodes.notFound,
+                message : `User ${messages.notFound}`
             })
         })
     })
@@ -408,24 +424,40 @@ const addingTutorialToUser = function (query, data) {
             name : data.name,
             description : data.description
         }
-        User.findOneAndUpdate(query, {$push : {tutorialProgress : tutorialProgres}}, {new:true})
-        .then((user) => {
-            if (user) {
-                resolve({
-                    status : statusCodes.successful,
-                    message : `Tutorial's progress ${messages.updated}`,
-                    data : user.tutorialProgress
-                });
-            } else {
-                reject({
-                    status : statusCodes.notFound,
-                    message : `User ${messages.notFound}`
-                });
+        User.findOne(query).then((user) => {
+            if(user) {
+                let found = user.tutorialProgress.find((tutorial) => tutorial.tutorialId === data.tutorialId)
+                if(found) {
+                    reject({
+                        status : statusCodes.forBidden,
+                        message : `Tutorial ${messages.alreadyInProgress}`
+                    })
+                } else {
+                    User.findOneAndUpdate(query, {$push : {tutorialProgress : tutorialProgres}}, {new:true})
+                    .then((user) => {
+                        if (user) {
+                            resolve({
+                                status : statusCodes.successful,
+                                message : `Tutorial's progress ${messages.updated}`,
+                                data : user.tutorialProgress
+                            });
+                        } else {
+                            reject({
+                                status : statusCodes.notFound,
+                                message : `User ${messages.notFound}`
+                            });
+                        }
+                    }).catch((error) => {
+                        reject({
+                            status : statusCodes.badRequest,
+                            data : error
+                        })
+                    })
+                }
             }
-        }).catch((error) => {
             reject({
-                status : statusCodes.badRequest,
-                data : error
+                status : statusCodes.notFound,
+                message : `User ${messages.notFound}`
             })
         })
     })
