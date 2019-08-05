@@ -111,7 +111,7 @@ router.patch('/user/:uuid/quiz/:quizId/updateStatus', (req,res) => {
     userLibs.quizCompleted({
         uuid : req.params.uuid,
         quizId : req.params.quizId
-    }).then((user) => {
+    }, req.body).then((user) => {
         res.status(user.status).send(user);
     }).catch((error) => {
         res.status(error.status).send(error);

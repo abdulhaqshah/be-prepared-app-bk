@@ -345,9 +345,18 @@ const updateQuizProgress = function(data) {
     })
 }
 
-const quizCompleted = function(data) {
+const quizCompleted = function(data, body) {
     return new Promise((resolve,reject) => {
-        User.updateOne({uuid: data.uuid, "quizProgress.quizId" : data.quizId}, {$set : {"quizProgress.$.completed" : true}}, {new:true})
+        User.updateOne(
+        {uuid: data.uuid,
+        "quizProgress.quizId" : data.quizId}, 
+        {$set : 
+            {"quizProgress.$.completed" : true,
+            "quizProgress.$.attempted" : body.attempted,
+            "quizProgress.$.correct" : body.correct}},
+        {new:true}
+        )
+
         .then((doc) => {
             if(doc){
                 resolve({

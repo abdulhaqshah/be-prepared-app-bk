@@ -35,9 +35,8 @@ let UserSchema = new mongoose.Schema({
         description : {type : String},
         quizId : {type : String},
         courseId : {type : String},
-        attempted : [{type : String}],
-        correct : [{type : String}],
-        failed : [{type : String}],
+        attempted : {type : Number},
+        correct : {type : Number},
         completed : {type : Boolean, default : false}
     }],
     tutorialProgress : [{
